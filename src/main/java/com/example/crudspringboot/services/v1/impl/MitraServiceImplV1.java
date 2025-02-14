@@ -7,8 +7,13 @@ import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,18 +66,21 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     }
 
     @Override
-    public List<MitraResponseV1> getAll() {
-        List<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc();
+    public Slice<MitraResponseV1> getAll(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Slice<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc(pageable);
 
-        return mitraList.stream()
-                .map(mitra -> MitraResponseV1.builder()
-                        .id(mitra.getId())
-                        .name(mitra.getName())
-                        .address(mitra.getAddress())
-                        .type(mitra.getType())
-                        .createdDate(mitra.getCreatedDate())
-                        .build())
-                .collect(Collectors.toList());
+        List<MitraResponseV1> responses = new ArrayList<>();
+        for (MitraEntity mitra : mitraList) {
+            responses.add(MitraResponseV1.builder()
+                    .id(mitra.getId())
+                    .name(mitra.getName())
+                    .address(mitra.getAddress())
+                    .type(mitra.getType())
+                    .createdDate(mitra.getCreatedDate())
+                    .build());
+        }
+        return new SliceImpl<>(responses, pageable, mitraList.hasNext());
     }
 
     @Override

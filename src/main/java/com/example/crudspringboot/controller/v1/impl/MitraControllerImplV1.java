@@ -6,10 +6,9 @@ import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import com.example.crudspringboot.utils.ApiResponse;
+import com.example.crudspringboot.utils.keputran.ResponseHelper;
+import com.example.crudspringboot.utils.keputran.SliceResponseParameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,13 +38,8 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     }
 
     @Override
-    public ApiResponse<List<MitraResponseV1>> getAll() {
-        List<MitraResponseV1> responses = mitraService.getAll();
-        if (responses != null) {
-            return new ApiResponse<>(true, "Success", responses);
-        } else {
-            return new ApiResponse<>(false, "Failed to get", null);
-        }
+    public SliceResponseParameter<MitraResponseV1> getAll(Integer page, Integer size) {
+        return ResponseHelper.createResponse(mitraService.getAll(page, size));
     }
 
     @Override

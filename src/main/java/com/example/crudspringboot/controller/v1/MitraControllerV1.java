@@ -4,6 +4,7 @@ import com.example.crudspringboot.controller.advices.BaseController;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.utils.ApiResponse;
+import com.example.crudspringboot.utils.keputran.SliceResponseParameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,10 @@ public interface MitraControllerV1 {
     );
 
     @GetMapping
-    ApiResponse<List<MitraResponseV1>> getAll();
+    SliceResponseParameter<MitraResponseV1> getAll(
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+    );
 
     @PutMapping("/{id}")
     ApiResponse<MitraResponseV1> update(
