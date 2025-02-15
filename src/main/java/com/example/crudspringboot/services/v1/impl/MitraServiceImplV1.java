@@ -5,6 +5,7 @@ import com.example.crudspringboot.repositories.entities.MitraEntity;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
+import com.example.crudspringboot.utils.keputran.BaseResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -66,6 +67,23 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     }
 
     @Override
+    public List<MitraResponseV1> getAllList() {
+        List<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc();
+
+        List<MitraResponseV1> responses = new ArrayList<>();
+        for (MitraEntity mitra : mitraList) {
+            responses.add(MitraResponseV1.builder()
+                    .id(mitra.getId())
+                    .name(mitra.getName())
+                    .address(mitra.getAddress())
+                    .type(mitra.getType())
+                    .createdDate(mitra.getCreatedDate())
+                    .build());
+        }
+        return responses;
+    }
+
+    @Override
     public Slice<MitraResponseV1> getAll(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Slice<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc(pageable);
@@ -104,9 +122,14 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     }
 
     @Override
-    public void delete(String id) {
+    public BaseResponse delete(String id) {
         MitraEntity mitra = mitraRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mitra not found with id: " + id));
         mitraRepository.delete(mitra);
+
+        return BaseResponse.builder()
+                .success(true)
+                .message("Mitra deleted")
+                .build();
     }
 }

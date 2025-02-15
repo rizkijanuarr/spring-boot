@@ -6,8 +6,7 @@ import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import com.example.crudspringboot.utils.ApiResponse;
-import com.example.crudspringboot.utils.keputran.ResponseHelper;
-import com.example.crudspringboot.utils.keputran.SliceResponseParameter;
+import com.example.crudspringboot.utils.keputran.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -18,23 +17,18 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     private final MitraServiceV1 mitraService;
 
     @Override
-    public ApiResponse<MitraResponseV1> create(MitraRequestV1 request) {
-        MitraResponseV1 responses = mitraService.create(request);
-        if (responses != null) {
-            return new ApiResponse<>(true, "Created", responses);
-        } else {
-            return new ApiResponse<>(false, "Failed to create", null);
-        }
+    public DataResponseParameter<MitraResponseV1> create(MitraRequestV1 request) {
+        return ResponseHelper.createResponse(mitraService.create(request));
     }
 
     @Override
-    public ApiResponse<MitraResponseV1> getById(String id) {
-        MitraResponseV1 responses = mitraService.getById(id);
-        if (responses != null) {
-            return new ApiResponse<>(true, "Success", responses);
-        } else {
-            return new ApiResponse<>(false, "Failed to get", null);
-        }
+    public DataResponseParameter<MitraResponseV1> getById(String id) {
+        return ResponseHelper.createResponse(mitraService.getById(id));
+    }
+
+    @Override
+    public ListResponseParameter<MitraResponseV1> getAllList() {
+        return ResponseHelper.createResponse(mitraService.getAllList());
     }
 
     @Override
@@ -43,18 +37,12 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     }
 
     @Override
-    public ApiResponse<MitraResponseV1> update(String id, MitraRequestV1 request) {
-        MitraResponseV1 responses = mitraService.update(id, request);
-        if (responses != null) {
-            return new ApiResponse<>(true, "Success", responses);
-        } else {
-            return new ApiResponse<>(false, "Failed to update", null);
-        }
+    public DataResponseParameter<MitraResponseV1> update(String id, MitraRequestV1 request) {
+        return ResponseHelper.createResponse(mitraService.update(id, request));
     }
 
     @Override
-    public ApiResponse<Void> delete(String id) {
-        mitraService.delete(id);
-        return new ApiResponse<>(true, "Success", null);
+    public BaseResponse delete(String id) {
+        return ResponseHelper.createBaseResponse(mitraService.delete(id));
     }
 }

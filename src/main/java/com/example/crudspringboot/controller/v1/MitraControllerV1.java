@@ -4,6 +4,9 @@ import com.example.crudspringboot.controller.advices.BaseController;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.utils.ApiResponse;
+import com.example.crudspringboot.utils.keputran.BaseResponse;
+import com.example.crudspringboot.utils.keputran.DataResponseParameter;
+import com.example.crudspringboot.utils.keputran.ListResponseParameter;
 import com.example.crudspringboot.utils.keputran.SliceResponseParameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +17,17 @@ import java.util.List;
 @BaseController("v1/mitra")
 public interface MitraControllerV1 {
     @PostMapping("/create")
-    ApiResponse<MitraResponseV1> create(
+    DataResponseParameter<MitraResponseV1> create(
             @RequestBody MitraRequestV1 request
     );
 
     @GetMapping("/{id}")
-    ApiResponse<MitraResponseV1> getById(
+    DataResponseParameter<MitraResponseV1> getById(
             @PathVariable("id") String id
     );
+
+    @GetMapping("/list")
+    ListResponseParameter<MitraResponseV1> getAllList();
 
     @GetMapping
     SliceResponseParameter<MitraResponseV1> getAll(
@@ -30,13 +36,13 @@ public interface MitraControllerV1 {
     );
 
     @PutMapping("/{id}")
-    ApiResponse<MitraResponseV1> update(
+    DataResponseParameter<MitraResponseV1> update(
             @PathVariable("id") String id,
             @RequestBody MitraRequestV1 request
     );
 
     @DeleteMapping("/{id}")
-    ApiResponse<Void> delete(
+    BaseResponse delete(
             @PathVariable("id") String id
     );
 }
