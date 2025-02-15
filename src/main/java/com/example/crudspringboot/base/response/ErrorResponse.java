@@ -1,4 +1,4 @@
-package com.example.crudspringboot.utils.keputran;
+package com.example.crudspringboot.base.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

@@ -1,4 +1,4 @@
-package com.example.crudspringboot.config.message;
+package com.example.crudspringboot.base.message;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;

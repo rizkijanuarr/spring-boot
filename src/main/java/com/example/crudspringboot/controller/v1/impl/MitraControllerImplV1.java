@@ -1,15 +1,15 @@
 package com.example.crudspringboot.controller.v1.impl;
 
+import com.example.crudspringboot.base.response.DataResponseParameter;
+import com.example.crudspringboot.base.response.ListResponseParameter;
+import com.example.crudspringboot.base.response.ResponseHelper;
+import com.example.crudspringboot.base.response.SliceResponseParameter;
 import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.MitraControllerV1;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
-import com.example.crudspringboot.utils.ApiResponse;
-import com.example.crudspringboot.utils.keputran.*;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @BaseControllerImpl
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     }
 
     @Override
-    public BaseResponse delete(String id) {
-        return ResponseHelper.createBaseResponse(mitraService.delete(id));
+    public DataResponseParameter<MitraResponseV1> delete(String id) {
+        return ResponseHelper.createResponse(mitraService.delete(id));
     }
 }

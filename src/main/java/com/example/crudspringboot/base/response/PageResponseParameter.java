@@ -1,4 +1,4 @@
-package com.example.crudspringboot.utils.keputran;
+package com.example.crudspringboot.base.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -18,10 +18,14 @@ import java.util.List;
 @JsonSerialize
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class ListResponseParameter<T> {
+public class PageResponseParameter<T> {
     @Builder.Default
     private Boolean success = true;
     private String message;
     private List<T> data;
+    private Integer currentPage;
+    private Integer totalPage;
+    private Long totalData;
+    private Integer pageSize;
     private List<ErrorResponse> errors;
 }

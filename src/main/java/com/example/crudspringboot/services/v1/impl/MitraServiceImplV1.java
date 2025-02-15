@@ -1,11 +1,13 @@
 package com.example.crudspringboot.services.v1.impl;
 
+import com.example.crudspringboot.base.message.MessageLib;
+import com.example.crudspringboot.base.exceptions.BadRequestException;
+import com.example.crudspringboot.base.validation.Validate;
 import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.MitraEntity;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
-import com.example.crudspringboot.utils.keputran.BaseResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -14,27 +16,24 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class MitraServiceImplV1 implements MitraServiceV1 {
     private final MitraRepository mitraRepository;
+    private final MessageLib messageLib;
 
     @Override
     public MitraResponseV1 create(MitraRequestV1 request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nama tidak boleh kosong");
-        }
-        if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("Alamat tidak boleh kosong");
-        }
-        if (request.getType() == null) {
-            throw new IllegalArgumentException("Tipe tidak boleh null");
-        }
+        Validate.c(request, Map.of(
+                messageLib.getMitraNameCantNull(), MitraRequestV1::getName,
+                messageLib.getMitraAddressCantNull(), MitraRequestV1::getAddress,
+                messageLib.getMitraTypeCantNull(), MitraRequestV1::getType
+        ));
 
         MitraEntity mitra = new MitraEntity();
         mitra.setName(request.getName());
@@ -55,14 +54,19 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     @Override
     public MitraResponseV1 getById(String id) {
         MitraEntity mitra = mitraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mitra not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
 
         return MitraResponseV1.builder()
                 .id(mitra.getId())
                 .name(mitra.getName())
                 .address(mitra.getAddress())
                 .type(mitra.getType())
+                .active(mitra.getActive())
                 .createdDate(mitra.getCreatedDate())
+                .modifiedDate(mitra.getModifiedDate())
+                .modifiedBy(mitra.getModifiedBy())
+                .deletedDate(mitra.getDeletedDate())
+                .deletedBy(mitra.getDeletedBy())
                 .build();
     }
 
@@ -77,7 +81,12 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
                     .name(mitra.getName())
                     .address(mitra.getAddress())
                     .type(mitra.getType())
+                    .active(mitra.getActive())
                     .createdDate(mitra.getCreatedDate())
+                    .modifiedDate(mitra.getModifiedDate())
+                    .modifiedBy(mitra.getModifiedBy())
+                    .deletedDate(mitra.getDeletedDate())
+                    .deletedBy(mitra.getDeletedBy())
                     .build());
         }
         return responses;
@@ -95,7 +104,12 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
                     .name(mitra.getName())
                     .address(mitra.getAddress())
                     .type(mitra.getType())
+                    .active(mitra.getActive())
                     .createdDate(mitra.getCreatedDate())
+                    .modifiedDate(mitra.getModifiedDate())
+                    .modifiedBy(mitra.getModifiedBy())
+                    .deletedDate(mitra.getDeletedDate())
+                    .deletedBy(mitra.getDeletedBy())
                     .build());
         }
         return new SliceImpl<>(responses, pageable, mitraList.hasNext());
@@ -104,11 +118,13 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     @Override
     public MitraResponseV1 update(String id, MitraRequestV1 request) {
         MitraEntity mitra = mitraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mitra not found with id: " + id));
+                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
 
         mitra.setName(request.getName());
         mitra.setAddress(request.getAddress());
         mitra.setType(request.getType());
+        mitra.setModifiedBy(getModifiedByUpdate());
+        mitra.setModifiedDate(LocalDateTime.now());
 
         MitraEntity updated = mitraRepository.save(mitra);
 
@@ -118,18 +134,45 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
                 .address(updated.getAddress())
                 .type(updated.getType())
                 .createdDate(mitra.getCreatedDate())
+                .modifiedDate(mitra.getModifiedDate())
+                .modifiedBy(mitra.getModifiedBy())
                 .build();
     }
 
     @Override
-    public BaseResponse delete(String id) {
+    public MitraResponseV1 delete(String id) {
         MitraEntity mitra = mitraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Mitra not found with id: " + id));
-        mitraRepository.delete(mitra);
+                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
 
-        return BaseResponse.builder()
-                .success(true)
-                .message("Mitra deleted")
+        mitra.setDeletedDate(LocalDateTime.now()); // Menandai kapan data dihapus
+        mitra.setDeletedBy(getCurentUser()); // Atau ambil dari user yang login
+        mitra.setModifiedBy(getModifiedByDelete()); // Set modifiedDate juga
+        mitra.setActive(false); // Menonaktifkan entitas, agar tidak muncul dalam query normal
+
+        mitraRepository.save(mitra);
+
+        return MitraResponseV1.builder()
+                .id(mitra.getId())
+                .name(mitra.getName())
+                .address(mitra.getAddress())
+                .type(mitra.getType())
+                .createdDate(mitra.getCreatedDate())
+                .modifiedBy(mitra.getModifiedBy())
+                .deletedBy(mitra.getDeletedBy())
+                .deletedDate(mitra.getDeletedDate())
+                .active(mitra.getActive())
                 .build();
+    }
+
+    private String getCurentUser() {
+        return "SYSTEM";
+    }
+
+    private String getModifiedByDelete() {
+        return "SOFT DELETE";
+    }
+
+    private String getModifiedByUpdate() {
+        return "UPDATE";
     }
 }

@@ -1,10 +1,10 @@
-package com.example.crudspringboot.utils;
+package com.example.crudspringboot.base.date;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class DateUtils {
+public class Date {
 
     // ISO 8601 (Default JSON API)
     private static final DateTimeFormatter ISO_FORMATTER =

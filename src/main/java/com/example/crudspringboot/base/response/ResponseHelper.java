@@ -1,4 +1,4 @@
-package com.example.crudspringboot.utils.keputran;
+package com.example.crudspringboot.base.response;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;

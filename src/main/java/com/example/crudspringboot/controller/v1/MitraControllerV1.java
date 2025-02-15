@@ -3,16 +3,10 @@ package com.example.crudspringboot.controller.v1;
 import com.example.crudspringboot.controller.advices.BaseController;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
-import com.example.crudspringboot.utils.ApiResponse;
-import com.example.crudspringboot.utils.keputran.BaseResponse;
-import com.example.crudspringboot.utils.keputran.DataResponseParameter;
-import com.example.crudspringboot.utils.keputran.ListResponseParameter;
-import com.example.crudspringboot.utils.keputran.SliceResponseParameter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import com.example.crudspringboot.base.response.DataResponseParameter;
+import com.example.crudspringboot.base.response.ListResponseParameter;
+import com.example.crudspringboot.base.response.SliceResponseParameter;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @BaseController("v1/mitra")
 public interface MitraControllerV1 {
@@ -42,7 +36,7 @@ public interface MitraControllerV1 {
     );
 
     @DeleteMapping("/{id}")
-    BaseResponse delete(
+    DataResponseParameter<MitraResponseV1> delete(
             @PathVariable("id") String id
     );
 }
