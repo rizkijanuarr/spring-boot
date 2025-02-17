@@ -27,4 +27,19 @@ public class FarmerControllerImplV1 implements FarmerControllerV1 {
     public DataResponseParameter<FarmerResponseV1> store(FarmerRequestV1 request) {
         return ResponseHelper.createResponse(farmerServiceV1.store(request));
     }
+
+    @Override
+    public DataResponseParameter<FarmerResponseV1> show(String id) {
+        return ResponseHelper.createResponse(farmerServiceV1.show(id));
+    }
+
+    @Override
+    public DataResponseParameter<FarmerResponseV1> update(String id, FarmerRequestV1 request) {
+        return ResponseHelper.createResponse(farmerServiceV1.update(id, request));
+    }
+
+    @Override
+    public DataResponseParameter<FarmerResponseV1> delete(String id) {
+        return ResponseHelper.createResponse(farmerServiceV1.delete(id));
+    }
 }

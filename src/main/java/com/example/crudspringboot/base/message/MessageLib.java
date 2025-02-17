@@ -28,4 +28,8 @@ public class MessageLib {
     public String getMitraNotFound() {
         return messageConfig.get("mitra.not.found");
     }
+
+    public String getFarmerNotFound() {
+        return messageConfig.get("farmer.not.found");
+    }
 }

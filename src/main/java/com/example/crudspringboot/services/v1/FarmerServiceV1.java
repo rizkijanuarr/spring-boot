@@ -8,4 +8,7 @@ import java.util.List;
 public interface FarmerServiceV1 {
     List<FarmerResponseV1> index();
     FarmerResponseV1 store(FarmerRequestV1 request);
+    FarmerResponseV1 show(String id);
+    FarmerResponseV1 update(String id, FarmerRequestV1 request);
+    FarmerResponseV1 delete(String id);
 }

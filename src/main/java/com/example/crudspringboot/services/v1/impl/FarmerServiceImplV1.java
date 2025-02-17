@@ -13,6 +13,7 @@ import com.example.crudspringboot.services.v1.FarmerServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,6 +43,44 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         return responses(saved);
     }
 
+    @Override
+    public FarmerResponseV1 show(String id) {
+        FarmerEntity farmer = farmerRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+        return responses(farmer);
+    }
+
+    @Override
+    public FarmerResponseV1 update(String id, FarmerRequestV1 request) {
+        FarmerEntity farmer = farmerRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+        MitraEntity mitra = mitraRepository.findById(request.getMitraId())
+                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
+
+        farmer.setName(request.getName());
+        farmer.setAddress(request.getAddress());
+        farmer.setMitra(mitra);
+        farmer.setModifiedBy(getModifiedByUpdate());
+        farmer.setModifiedDate(getModifiedDate());
+
+        FarmerEntity updated = farmerRepository.save(farmer);
+        return responses(updated);
+    }
+
+    @Override
+    public FarmerResponseV1 delete(String id) {
+        FarmerEntity farmer = farmerRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+
+        farmer.setDeletedDate(getModifiedDate());
+        farmer.setDeletedBy(getCurentUser());
+        farmer.setModifiedBy(getModifiedByDelete());
+        farmer.setActive(false);
+
+        farmerRepository.save(farmer);
+        return responses(farmer);
+    }
+
     private FarmerResponseV1 responses(FarmerEntity entity) {
         return FarmerResponseV1.builder()
                 .id(entity.getId())
@@ -58,5 +97,21 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
                 .deletedBy(entity.getDeletedBy())
                 .modifiedBy(entity.getModifiedBy())
                 .build();
+    }
+
+    private LocalDateTime getModifiedDate() {
+        return LocalDateTime.now();
+    }
+
+    private String getModifiedByUpdate() {
+        return "UPDATE";
+    }
+
+    private String getModifiedByDelete() {
+        return "SOFT DELETE";
+    }
+
+    private String getCurentUser() {
+        return "SYSTEM";
     }
 }
