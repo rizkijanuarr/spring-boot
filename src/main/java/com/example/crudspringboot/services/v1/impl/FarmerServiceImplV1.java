@@ -25,7 +25,7 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
 
     @Override
     public List<FarmerResponseV1> index() {
-        List<FarmerEntity> farmers = farmerRepository.findAll();
+        List<FarmerEntity> farmers = farmerRepository.findAllByOrderByCreatedDateDesc();
         return farmers.stream().map(this::responses).toList();
     }
 
