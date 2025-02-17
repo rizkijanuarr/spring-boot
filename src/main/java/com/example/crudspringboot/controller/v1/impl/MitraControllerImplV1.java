@@ -10,6 +10,7 @@ import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 @BaseControllerImpl
 @RequiredArgsConstructor
@@ -32,8 +33,8 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     }
 
     @Override
-    public SliceResponseParameter<MitraResponseV1> getAll(Integer page, Integer size) {
-        return ResponseHelper.createResponse(mitraService.getAll(page, size));
+    public SliceResponseParameter<MitraResponseV1> getAll(Pageable pageable) {
+        return ResponseHelper.createResponse(mitraService.getAll(pageable));
     }
 
     @Override

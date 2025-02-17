@@ -7,6 +7,7 @@ import com.example.crudspringboot.base.response.DataResponseParameter;
 import com.example.crudspringboot.base.response.ListResponseParameter;
 import com.example.crudspringboot.base.response.SliceResponseParameter;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 @BaseController("v1/mitra")
 public interface MitraControllerV1 {
@@ -25,8 +26,7 @@ public interface MitraControllerV1 {
 
     @GetMapping
     SliceResponseParameter<MitraResponseV1> getAll(
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+           Pageable pageable
     );
 
     @PutMapping("/{id}")

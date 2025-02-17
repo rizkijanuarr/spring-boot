@@ -93,8 +93,7 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     }
 
     @Override
-    public Slice<MitraResponseV1> getAll(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Slice<MitraResponseV1> getAll(Pageable pageable) {
         Slice<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc(pageable);
 
         List<MitraResponseV1> responses = new ArrayList<>();
