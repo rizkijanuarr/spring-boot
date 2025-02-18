@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -27,7 +28,11 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
     @Override
     public List<FarmerResponseV1> index() {
         List<FarmerEntity> farmers = farmerRepository.findAllByOrderByCreatedDateDesc();
-        return farmers.stream().map(this::responses).toList();
+        List<FarmerResponseV1> responses = new ArrayList<>();
+        for (FarmerEntity farmer : farmers) {
+            responses.add(responses(farmer));
+        }
+        return responses;
     }
 
     @Override

@@ -31,7 +31,11 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     @Override
     public List<MitraResponseV1> index() {
         List<MitraEntity> mitras = mitraRepository.findAllByOrderByCreatedDateDesc();
-        return mitras.stream().map(this::responses).toList();
+        List<MitraResponseV1> responses = new ArrayList<>();
+        for (MitraEntity mitra : mitras) {
+            responses.add(responses(mitra));
+        }
+        return responses;
     }
 
     @Override

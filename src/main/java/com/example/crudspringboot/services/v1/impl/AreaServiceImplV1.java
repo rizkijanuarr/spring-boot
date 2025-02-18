@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +30,11 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
     @Override
     public List<AreaResponseV1> index() {
         List<AreaEntity> areas = areaRepository.findAllByOrderByCreatedDateDesc();
-        return areas.stream().map(this::responses).toList();
+        List<AreaResponseV1> responses = new ArrayList<>();
+        for (AreaEntity area : areas) {
+            responses.add(responses(area));
+        }
+        return responses;
     }
 
     @Override
@@ -57,14 +62,14 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
     public AreaResponseV1 update(String id, AreaRequestV1 req) {
         AreaEntity areas = areaRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(messageLib.getAreaNotFound()));
-        FarmerEntity farmer = farmerRepository.findById(id)
+        FarmerEntity farmer = farmerRepository.findById(req.getFarmer_id())
                 .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
 
         areas.setArea_name(req.getArea_name());
         areas.setArea_land(req.getArea_land());
         areas.setFarmer(farmer);
-        farmer.setModifiedBy(getModifiedByUpdate());
-        farmer.setModifiedDate(getModifiedDate());
+        areas.setModifiedBy(getModifiedByUpdate());
+        areas.setModifiedDate(getModifiedDate());
 
         AreaEntity updated = areaRepository.save(areas);
         return responses(updated);
