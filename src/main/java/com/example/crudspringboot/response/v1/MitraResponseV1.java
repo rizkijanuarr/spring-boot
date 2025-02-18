@@ -22,9 +22,11 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MitraResponseV1 {
     private String id;
-    private String name;
-    private String address;
-    private MitraTypeEnum type;
+    private String mitra_code;
+    private String mitra_name;
+    private String mitra_phone;
+    private String mitra_address;
+    private MitraTypeEnum mitra_type;
 
     @JsonIgnore
     private LocalDateTime createdDate;

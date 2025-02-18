@@ -32,4 +32,8 @@ public class MessageLib {
     public String getFarmerNotFound() {
         return messageConfig.get("farmer.not.found");
     }
+
+    public String getAreaNotFound() {
+        return messageConfig.get("area.not.found");
+    }
 }

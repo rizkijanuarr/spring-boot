@@ -18,28 +18,23 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     private final MitraServiceV1 mitraService;
 
     @Override
-    public DataResponseParameter<MitraResponseV1> create(MitraRequestV1 request) {
-        return ResponseHelper.createResponse(mitraService.create(request));
+    public ListResponseParameter<MitraResponseV1> index() {
+        return ResponseHelper.createResponse(mitraService.index());
     }
 
     @Override
-    public DataResponseParameter<MitraResponseV1> getById(String id) {
-        return ResponseHelper.createResponse(mitraService.getById(id));
+    public DataResponseParameter<MitraResponseV1> store(MitraRequestV1 req) {
+        return ResponseHelper.createResponse(mitraService.store(req));
     }
 
     @Override
-    public ListResponseParameter<MitraResponseV1> getAllList() {
-        return ResponseHelper.createResponse(mitraService.getAllList());
+    public DataResponseParameter<MitraResponseV1> show(String id) {
+        return ResponseHelper.createResponse(mitraService.show(id));
     }
 
     @Override
-    public SliceResponseParameter<MitraResponseV1> getAll(Pageable pageable) {
-        return ResponseHelper.createResponse(mitraService.getAll(pageable));
-    }
-
-    @Override
-    public DataResponseParameter<MitraResponseV1> update(String id, MitraRequestV1 request) {
-        return ResponseHelper.createResponse(mitraService.update(id, request));
+    public DataResponseParameter<MitraResponseV1> update(String id, MitraRequestV1 req) {
+        return ResponseHelper.createResponse(mitraService.update(id, req));
     }
 
     @Override

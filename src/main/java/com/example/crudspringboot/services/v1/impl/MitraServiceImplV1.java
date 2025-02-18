@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -28,114 +29,45 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     private final MessageLib messageLib;
 
     @Override
-    public MitraResponseV1 create(MitraRequestV1 request) {
-        Validate.c(request, Map.of(
-                messageLib.getMitraNameCantNull(), MitraRequestV1::getName,
-                messageLib.getMitraAddressCantNull(), MitraRequestV1::getAddress,
-                messageLib.getMitraTypeCantNull(), MitraRequestV1::getType
-        ));
+    public List<MitraResponseV1> index() {
+        List<MitraEntity> mitras = mitraRepository.findAllByOrderByCreatedDateDesc();
+        return mitras.stream().map(this::responses).toList();
+    }
 
+    @Override
+    public MitraResponseV1 store(MitraRequestV1 req) {
         MitraEntity mitra = new MitraEntity();
-        mitra.setName(request.getName());
-        mitra.setAddress(request.getAddress());
-        mitra.setType(request.getType());
+        mitra.setMitra_code(req.getMitra_code() != null ? req.getMitra_code() : generateRandomCode());
+        mitra.setMitra_name(req.getMitra_name());
+        mitra.setMitra_phone(req.getMitra_phone());
+        mitra.setMitra_address(req.getMitra_address());
+        mitra.setMitra_type(req.getMitra_type());
 
-        MitraEntity saved = mitraRepository.save(mitra);
-
-        return MitraResponseV1.builder()
-                .id(saved.getId())
-                .name(saved.getName())
-                .address(saved.getAddress())
-                .type(saved.getType())
-                .createdDate(mitra.getCreatedDate())
-                .build();
+        MitraEntity created = mitraRepository.save(mitra);
+        return responses(created);
     }
 
     @Override
-    public MitraResponseV1 getById(String id) {
+    public MitraResponseV1 show(String id) {
+        MitraEntity mitra = mitraRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
+        return responses(mitra);
+    }
+
+    @Override
+    public MitraResponseV1 update(String id, MitraRequestV1 req) {
         MitraEntity mitra = mitraRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
 
-        return MitraResponseV1.builder()
-                .id(mitra.getId())
-                .name(mitra.getName())
-                .address(mitra.getAddress())
-                .type(mitra.getType())
-                .active(mitra.getActive())
-                .createdDate(mitra.getCreatedDate())
-                .modifiedDate(mitra.getModifiedDate())
-                .modifiedBy(mitra.getModifiedBy())
-                .deletedDate(mitra.getDeletedDate())
-                .deletedBy(mitra.getDeletedBy())
-                .build();
-    }
-
-    @Override
-    public List<MitraResponseV1> getAllList() {
-        List<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc();
-
-        List<MitraResponseV1> responses = new ArrayList<>();
-        for (MitraEntity mitra : mitraList) {
-            responses.add(MitraResponseV1.builder()
-                    .id(mitra.getId())
-                    .name(mitra.getName())
-                    .address(mitra.getAddress())
-                    .type(mitra.getType())
-                    .active(mitra.getActive())
-                    .createdDate(mitra.getCreatedDate())
-                    .modifiedDate(mitra.getModifiedDate())
-                    .modifiedBy(mitra.getModifiedBy())
-                    .deletedDate(mitra.getDeletedDate())
-                    .deletedBy(mitra.getDeletedBy())
-                    .build());
-        }
-        return responses;
-    }
-
-    @Override
-    public Slice<MitraResponseV1> getAll(Pageable pageable) {
-        Slice<MitraEntity> mitraList = mitraRepository.findAllByOrderByCreatedDateDesc(pageable);
-
-        List<MitraResponseV1> responses = new ArrayList<>();
-        for (MitraEntity mitra : mitraList) {
-            responses.add(MitraResponseV1.builder()
-                    .id(mitra.getId())
-                    .name(mitra.getName())
-                    .address(mitra.getAddress())
-                    .type(mitra.getType())
-                    .active(mitra.getActive())
-                    .createdDate(mitra.getCreatedDate())
-                    .modifiedDate(mitra.getModifiedDate())
-                    .modifiedBy(mitra.getModifiedBy())
-                    .deletedDate(mitra.getDeletedDate())
-                    .deletedBy(mitra.getDeletedBy())
-                    .build());
-        }
-        return new SliceImpl<>(responses, pageable, mitraList.hasNext());
-    }
-
-    @Override
-    public MitraResponseV1 update(String id, MitraRequestV1 request) {
-        MitraEntity mitra = mitraRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
-
-        mitra.setName(request.getName());
-        mitra.setAddress(request.getAddress());
-        mitra.setType(request.getType());
+        mitra.setMitra_name(req.getMitra_name());
+        mitra.setMitra_phone(req.getMitra_phone());
+        mitra.setMitra_address(req.getMitra_address());
+        mitra.setMitra_type(req.getMitra_type());
         mitra.setModifiedBy(getModifiedByUpdate());
-        mitra.setModifiedDate(LocalDateTime.now());
+        mitra.setModifiedDate(getModifiedDate());
 
         MitraEntity updated = mitraRepository.save(mitra);
-
-        return MitraResponseV1.builder()
-                .id(updated.getId())
-                .name(updated.getName())
-                .address(updated.getAddress())
-                .type(updated.getType())
-                .createdDate(mitra.getCreatedDate())
-                .modifiedDate(mitra.getModifiedDate())
-                .modifiedBy(mitra.getModifiedBy())
-                .build();
+        return responses(updated);
     }
 
     @Override
@@ -143,23 +75,29 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
         MitraEntity mitra = mitraRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
 
-        mitra.setDeletedDate(LocalDateTime.now()); // Menandai kapan data dihapus
-        mitra.setDeletedBy(getCurentUser()); // Atau ambil dari user yang login
-        mitra.setModifiedBy(getModifiedByDelete()); // Set modifiedDate juga
-        mitra.setActive(false); // Menonaktifkan entitas, agar tidak muncul dalam query normal
+        mitra.setDeletedDate(getModifiedDate());
+        mitra.setDeletedBy(getCurentUser());
+        mitra.setModifiedBy(getModifiedByDelete());
+        mitra.setActive(false);
 
         mitraRepository.save(mitra);
+        return responses(mitra);
+    }
 
+    private MitraResponseV1 responses(MitraEntity entity) {
         return MitraResponseV1.builder()
-                .id(mitra.getId())
-                .name(mitra.getName())
-                .address(mitra.getAddress())
-                .type(mitra.getType())
-                .createdDate(mitra.getCreatedDate())
-                .modifiedBy(mitra.getModifiedBy())
-                .deletedBy(mitra.getDeletedBy())
-                .deletedDate(mitra.getDeletedDate())
-                .active(mitra.getActive())
+                .id(entity.getId())
+                .mitra_code(entity.getMitra_code())
+                .mitra_name(entity.getMitra_name())
+                .mitra_phone(entity.getMitra_phone())
+                .mitra_address(entity.getMitra_address())
+                .mitra_type(entity.getMitra_type())
+                .active(entity.getActive())
+                .createdDate(entity.getCreatedDate())
+                .modifiedDate(entity.getModifiedDate())
+                .deletedDate(entity.getDeletedDate())
+                .deletedBy(entity.getDeletedBy())
+                .modifiedBy(entity.getModifiedBy())
                 .build();
     }
 
@@ -173,5 +111,17 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
 
     private String getModifiedByUpdate() {
         return "UPDATE";
+    }
+
+    private String generateRandomCode() {
+        Random random = new Random();
+        int num1 = 900 + random.nextInt(100);
+        int num2 = 1000 + random.nextInt(90000);
+        int num3 = 100 + random.nextInt(900);
+        return String.format("%d-%d-%d", num1, num2, num3);
+    }
+
+    private LocalDateTime getModifiedDate() {
+        return LocalDateTime.now();
     }
 }
