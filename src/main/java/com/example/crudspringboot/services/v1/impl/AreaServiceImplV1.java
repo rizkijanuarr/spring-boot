@@ -6,6 +6,7 @@ import com.example.crudspringboot.repositories.AreaRepository;
 import com.example.crudspringboot.repositories.FarmerRepository;
 import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.AreaEntity;
+import com.example.crudspringboot.repositories.entities.CoordinateEntity;
 import com.example.crudspringboot.repositories.entities.FarmerEntity;
 import com.example.crudspringboot.request.v1.AreaRequestV1;
 import com.example.crudspringboot.response.v1.AreaResponseV1;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,12 +46,27 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
         FarmerEntity farmer = farmerRepository.findById(req.getFarmer_id())
                 .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
 
-        AreaEntity areas = new AreaEntity();
-        areas.setArea_name(req.getArea_name());
-        areas.setArea_land(req.getArea_land());
-        areas.setFarmer(farmer);
+        AreaEntity areas = new AreaEntity(); // membuat entitas area baru
+        areas.setArea_name(req.getArea_name()); // mengatur nama area berdasarkan dari request
+        areas.setArea_land(req.getArea_land()); // mengatur nilai luas area berdasarkan dari request
+        areas.setFarmer(farmer);  // mengaitkan farmer ke area
 
-        AreaEntity created = areaRepository.save(areas);
+        List<CoordinateEntity> coordinates = new ArrayList<>(); // membuat list untuk menyimpan koordinat
+
+        // melakukan iterasi terhadap daftar koordinat yang dikirim dari request
+        for (int i =0; i < req.getCoordinates().size(); i++) {
+            AreaRequestV1.CoordinatesReq req1 = req.getCoordinates().get(i); // mengambil satu koordinat req berdasarkan index i
+
+            CoordinateEntity coordinate = new CoordinateEntity(); // membuat entitas koordinat baru
+            coordinate.setSeq(i); // mengatur seq ke dalam urutan 0, 1,2,3
+            coordinate.setLat(req1.getLat()); // mengatur nilai lat dari request
+            coordinate.setLng(req1.getLng()); // mengatur nilai lng dari request
+            coordinate.setArea(areas); // mengaitkan koordinat ke area
+
+            coordinates.add(coordinate); // menambahkan koordinat ke dalam list
+        }
+        areas.setCoordinates(coordinates); // mengaitkan koordinat yang telah dibuat area
+        AreaEntity created = areaRepository.save(areas); // menyimpan area dan koordinat ke database
         return responses(created);
     }
 
@@ -129,12 +146,23 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                                 .build()
                         )
                         .build())
+                .coordinates(entity.getCoordinates().stream()
+                        .map(this::mapToCoordinates)
+                        .collect(Collectors.toList()))
                 .active(entity.getActive())
                 .createdDate(entity.getCreatedDate())
                 .modifiedDate(entity.getModifiedDate())
                 .deletedDate(entity.getDeletedDate())
                 .deletedBy(entity.getDeletedBy())
                 .modifiedBy(entity.getModifiedBy())
+                .build();
+    }
+
+    private AreaResponseV1.CoordinatesResponse mapToCoordinates(CoordinateEntity coordinate) {
+        return AreaResponseV1.CoordinatesResponse.builder()
+                .seq(coordinate.getSeq())
+                .lat(coordinate.getLat())
+                .lng(coordinate.getLng())
                 .build();
     }
 

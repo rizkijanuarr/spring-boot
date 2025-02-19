@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,6 +26,7 @@ public class AreaResponseV1 {
     private String area_name;
     private BigDecimal area_land;
     private FarmerResponse farmer;
+    private List<CoordinatesResponse> coordinates;
 
     @JsonIgnore
     private LocalDateTime createdDate;
@@ -71,4 +73,13 @@ public class AreaResponseV1 {
         private String mitra_name;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CoordinatesResponse {
+        private Integer seq;
+        private Double lat;
+        private Double lng;
+    }
 }
