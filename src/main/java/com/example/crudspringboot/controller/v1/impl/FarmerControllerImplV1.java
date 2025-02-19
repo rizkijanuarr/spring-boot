@@ -3,12 +3,14 @@ package com.example.crudspringboot.controller.v1.impl;
 import com.example.crudspringboot.base.response.DataResponseParameter;
 import com.example.crudspringboot.base.response.ListResponseParameter;
 import com.example.crudspringboot.base.response.ResponseHelper;
+import com.example.crudspringboot.base.response.SliceResponseParameter;
 import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.FarmerControllerV1;
 import com.example.crudspringboot.request.v1.FarmerRequestV1;
 import com.example.crudspringboot.response.v1.FarmerResponseV1;
 import com.example.crudspringboot.services.v1.FarmerServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 @BaseControllerImpl
 @RequiredArgsConstructor
@@ -38,5 +40,15 @@ public class FarmerControllerImplV1 implements FarmerControllerV1 {
     @Override
     public DataResponseParameter<FarmerResponseV1> delete(String id) {
         return ResponseHelper.createResponse(farmerService.delete(id));
+    }
+
+    @Override
+    public SliceResponseParameter<FarmerResponseV1> getFarmerActive(Pageable pageable) {
+        return ResponseHelper.createResponse(farmerService.getFarmerActive(pageable));
+    }
+
+    @Override
+    public SliceResponseParameter<FarmerResponseV1> getFarmerInActive(Pageable pageable) {
+        return ResponseHelper.createResponse(farmerService.getFarmerInActive(pageable));
     }
 }

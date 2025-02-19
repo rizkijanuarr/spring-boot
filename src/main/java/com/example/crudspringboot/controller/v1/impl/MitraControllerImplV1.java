@@ -41,4 +41,14 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     public DataResponseParameter<MitraResponseV1> delete(String id) {
         return ResponseHelper.createResponse(mitraService.delete(id));
     }
+
+    @Override
+    public SliceResponseParameter<MitraResponseV1> getMitraActive(Pageable pageable) {
+        return ResponseHelper.createResponse(mitraService.getMitraActive(pageable));
+    }
+
+    @Override
+    public SliceResponseParameter<MitraResponseV1> getMitraInActive(Pageable pageable) {
+        return ResponseHelper.createResponse(mitraService.getMitraInActive(pageable));
+    }
 }

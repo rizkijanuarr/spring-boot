@@ -18,4 +18,8 @@ public interface MitraRepository extends JpaRepository<MitraEntity, String> {
     List<MitraEntity> findAllByOrderByCreatedDateAsc(); // Terlama ke terbaru
     List<MitraEntity> findAllByOrderByIdAsc(); // ID terkecil ke terbesar // A - Z
     List<MitraEntity> findAllByOrderByIdDesc(); // ID terbesar ke terkecil // Z - A
+
+    Slice<MitraEntity> findAllByActiveTrueOrderByCreatedDateDesc(Pageable pageable);
+    Slice<MitraEntity> findAllByActiveFalseOrderByCreatedDateDesc(Pageable pageable);
+
 }

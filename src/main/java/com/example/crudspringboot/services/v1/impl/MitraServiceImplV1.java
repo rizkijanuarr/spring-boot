@@ -2,15 +2,12 @@ package com.example.crudspringboot.services.v1.impl;
 
 import com.example.crudspringboot.base.message.MessageLib;
 import com.example.crudspringboot.base.exceptions.BadRequestException;
-import com.example.crudspringboot.base.validation.Validate;
 import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.MitraEntity;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -86,6 +83,28 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
 
         mitraRepository.save(mitra);
         return responses(mitra);
+    }
+
+    public Slice<MitraResponseV1> getMitraActive(Pageable pageable) {
+        Slice<MitraEntity> mitraList = mitraRepository.findAllByActiveTrueOrderByCreatedDateDesc(pageable);
+        List<MitraResponseV1> responses = new ArrayList<>();
+
+        for (MitraEntity mitra : mitraList) {
+            responses.add(responses(mitra));
+        }
+
+        return new SliceImpl<>(responses, pageable, mitraList.hasNext());
+    }
+
+    public Slice<MitraResponseV1> getMitraInActive(Pageable pageable) {
+        Slice<MitraEntity> mitraList = mitraRepository.findAllByActiveFalseOrderByCreatedDateDesc(pageable);
+        List<MitraResponseV1> responses = new ArrayList<>();
+
+        for (MitraEntity mitra : mitraList) {
+            responses.add(responses(mitra));
+        }
+
+        return new SliceImpl<>(responses, pageable, mitraList.hasNext());
     }
 
     private MitraResponseV1 responses(MitraEntity entity) {

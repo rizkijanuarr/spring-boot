@@ -3,15 +3,14 @@ package com.example.crudspringboot.controller.v1.impl;
 import com.example.crudspringboot.base.response.DataResponseParameter;
 import com.example.crudspringboot.base.response.ListResponseParameter;
 import com.example.crudspringboot.base.response.ResponseHelper;
+import com.example.crudspringboot.base.response.SliceResponseParameter;
 import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.AreaControllerV1;
 import com.example.crudspringboot.request.v1.AreaRequestV1;
-import com.example.crudspringboot.request.v1.FarmerRequestV1;
 import com.example.crudspringboot.response.v1.AreaResponseV1;
-import com.example.crudspringboot.response.v1.FarmerResponseV1;
 import com.example.crudspringboot.services.v1.AreaServiceV1;
-import com.example.crudspringboot.services.v1.FarmerServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 @BaseControllerImpl
 @RequiredArgsConstructor
@@ -41,5 +40,15 @@ public class AreaControllerImplV1 implements AreaControllerV1 {
     @Override
     public DataResponseParameter<AreaResponseV1> delete(String id) {
         return ResponseHelper.createResponse(areaServiceV1.delete(id));
+    }
+
+    @Override
+    public SliceResponseParameter<AreaResponseV1> getAreaActive(Pageable pageable) {
+        return ResponseHelper.createResponse(areaServiceV1.getAreaActive(pageable));
+    }
+
+    @Override
+    public SliceResponseParameter<AreaResponseV1> getAreaInActive(Pageable pageable) {
+        return ResponseHelper.createResponse(areaServiceV1.getAreaInActive(pageable));
     }
 }

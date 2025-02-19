@@ -8,9 +8,11 @@ import com.example.crudspringboot.repositories.entities.FarmerEntity;
 import com.example.crudspringboot.repositories.entities.MitraEntity;
 import com.example.crudspringboot.request.v1.FarmerRequestV1;
 import com.example.crudspringboot.response.v1.FarmerResponseV1;
-import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.FarmerServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -88,6 +90,30 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
 
         farmerRepository.save(farmer);
         return responses(farmer);
+    }
+
+    @Override
+    public Slice<FarmerResponseV1> getFarmerActive(Pageable pageable) {
+        Slice<FarmerEntity> farmerList = farmerRepository.findAllByActiveTrueOrderByCreatedDateDesc(pageable);
+        List<FarmerResponseV1> responses = new ArrayList<>();
+
+        for (FarmerEntity farmer : farmerList) {
+            responses.add(responses(farmer));
+        }
+
+        return new SliceImpl<>(responses, pageable, farmerList.hasNext());
+    }
+
+    @Override
+    public Slice<FarmerResponseV1> getFarmerInActive(Pageable pageable) {
+        Slice<FarmerEntity> farmerList = farmerRepository.findAllByActiveFalseOrderByCreatedDateDesc(pageable);
+        List<FarmerResponseV1> responses = new ArrayList<>();
+
+        for (FarmerEntity farmer : farmerList) {
+            responses.add(responses(farmer));
+        }
+
+        return new SliceImpl<>(responses, pageable, farmerList.hasNext());
     }
 
     private FarmerResponseV1 responses(FarmerEntity entity) {

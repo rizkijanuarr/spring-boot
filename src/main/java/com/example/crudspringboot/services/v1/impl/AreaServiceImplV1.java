@@ -7,11 +7,13 @@ import com.example.crudspringboot.repositories.FarmerRepository;
 import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.AreaEntity;
 import com.example.crudspringboot.repositories.entities.FarmerEntity;
-import com.example.crudspringboot.repositories.entities.MitraEntity;
 import com.example.crudspringboot.request.v1.AreaRequestV1;
 import com.example.crudspringboot.response.v1.AreaResponseV1;
 import com.example.crudspringboot.services.v1.AreaServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -87,6 +89,28 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
 
         areaRepository.save(areas);
         return responses(areas);
+    }
+
+    public Slice<AreaResponseV1> getAreaActive(Pageable pageable) {
+        Slice<AreaEntity> areaList = areaRepository.findAllByActiveTrueOrderByCreatedDateDesc(pageable);
+        List<AreaResponseV1> responses = new ArrayList<>();
+
+        for (AreaEntity area : areaList) {
+            responses.add(responses(area));
+        }
+
+        return new SliceImpl<>(responses, pageable, areaList.hasNext());
+    }
+
+    public Slice<AreaResponseV1> getAreaInActive(Pageable pageable) {
+        Slice<AreaEntity> areaList = areaRepository.findAllByActiveFalseOrderByCreatedDateDesc(pageable);
+        List<AreaResponseV1> responses = new ArrayList<>();
+
+        for (AreaEntity area : areaList) {
+            responses.add(responses(area));
+        }
+
+        return new SliceImpl<>(responses, pageable, areaList.hasNext());
     }
 
     private AreaResponseV1 responses(AreaEntity entity) {

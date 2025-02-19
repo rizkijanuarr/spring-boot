@@ -30,4 +30,14 @@ public interface MitraControllerV1 {
             @PathVariable("id") String id
     );
 
+    @GetMapping("list/ACTIVE")
+    SliceResponseParameter<MitraResponseV1> getMitraActive(
+           Pageable pageable
+    );
+
+    @GetMapping("list/INACTIVE")
+    SliceResponseParameter<MitraResponseV1> getMitraInActive(
+            Pageable pageable
+    );
+
 }
