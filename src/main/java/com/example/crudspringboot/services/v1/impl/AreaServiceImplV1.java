@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class AreaServiceImplV1 implements AreaServiceV1 {
     private final AreaRepository areaRepository;
     private final FarmerRepository farmerRepository;
-    private final MitraRepository mitraRepository;
     private final MessageLib messageLib;
 
     @Override
@@ -46,27 +45,26 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
         FarmerEntity farmer = farmerRepository.findById(req.getFarmer_id())
                 .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
 
-        AreaEntity areas = new AreaEntity(); // membuat entitas area baru
-        areas.setArea_name(req.getArea_name()); // mengatur nama area berdasarkan dari request
-        areas.setArea_land(req.getArea_land()); // mengatur nilai luas area berdasarkan dari request
-        areas.setFarmer(farmer);  // mengaitkan farmer ke area
+        AreaEntity areas = new AreaEntity();
+        areas.setArea_name(req.getArea_name());
+        areas.setArea_land(req.getArea_land());
+        areas.setFarmer(farmer);
 
-        List<CoordinateEntity> coordinates = new ArrayList<>(); // membuat list untuk menyimpan koordinat
+        List<CoordinateEntity> coordinates = new ArrayList<>();
 
-        // melakukan iterasi terhadap daftar koordinat yang dikirim dari request
-        for (int i =0; i < req.getCoordinates().size(); i++) {
-            AreaRequestV1.CoordinatesReq req1 = req.getCoordinates().get(i); // mengambil satu koordinat req berdasarkan index i
+        if (req.getCoordinates() != null) {
+            for (AreaRequestV1.CoordinatesReq coordReq : req.getCoordinates()) {
+                CoordinateEntity coordinate = new CoordinateEntity();
+                coordinate.setSeq(coordReq.getSeq());
+                coordinate.setLat(coordReq.getLat());
+                coordinate.setLng(coordReq.getLng());
+                coordinate.setArea(areas);
 
-            CoordinateEntity coordinate = new CoordinateEntity(); // membuat entitas koordinat baru
-            coordinate.setSeq(i); // mengatur seq ke dalam urutan 0, 1,2,3
-            coordinate.setLat(req1.getLat()); // mengatur nilai lat dari request
-            coordinate.setLng(req1.getLng()); // mengatur nilai lng dari request
-            coordinate.setArea(areas); // mengaitkan koordinat ke area
-
-            coordinates.add(coordinate); // menambahkan koordinat ke dalam list
+                coordinates.add(coordinate);
+            }
         }
-        areas.setCoordinates(coordinates); // mengaitkan koordinat yang telah dibuat area
-        AreaEntity created = areaRepository.save(areas); // menyimpan area dan koordinat ke database
+        areas.setCoordinates(coordinates);
+        AreaEntity created = areaRepository.save(areas);
         return responses(created);
     }
 
