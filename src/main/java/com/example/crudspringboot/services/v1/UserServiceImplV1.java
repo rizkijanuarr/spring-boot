@@ -8,6 +8,9 @@ import com.example.crudspringboot.repositories.entities.UserEntity;
 import com.example.crudspringboot.request.v1.UserRequestV1;
 import com.example.crudspringboot.response.v1.UserResponseV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +88,18 @@ public class UserServiceImplV1 implements UserServiceV1 {
 
         userRepository.save(us);
         return responses(us);
+    }
+
+    @Override
+    public Slice<UserResponseV1> getUsersActive(Pageable pageable) {
+        Slice<UserEntity> usersList = userRepository.findAllByActiveTrueOrderByCreatedDateDesc(pageable);
+        List<UserResponseV1> responses = new ArrayList<>();
+
+        for (UserEntity user : usersList) {
+            responses.add(responses(user));
+        }
+
+        return new SliceImpl<>(responses, pageable, usersList.hasNext());
     }
 
     private UserResponseV1 responses(UserEntity entity) {

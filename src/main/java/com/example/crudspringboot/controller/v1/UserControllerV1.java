@@ -1,8 +1,10 @@
 package com.example.crudspringboot.controller.v1;
 
 import com.example.crudspringboot.base.response.BaseResponse;
+import com.example.crudspringboot.base.response.BaseResponseSlice;
 import com.example.crudspringboot.request.v1.UserRequestV1;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +26,8 @@ public interface UserControllerV1 {
 
     @DeleteMapping("/{id}")
     ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+
+    @GetMapping("list/ACTIVE")
+    ResponseEntity<BaseResponseSlice> getUsersActive(Pageable pageable);
 
 }
