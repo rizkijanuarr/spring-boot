@@ -1,6 +1,5 @@
 package com.example.crudspringboot.base.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,17 +8,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonSerialize
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class BaseResponse {
+public class BaseResponseSlice {
+    private Boolean isFirst;
+    private Boolean isLast;
+    private Boolean hasNext;
     private Boolean success;
     private Object data;
-    private List<BaseErrorResponse> errors;
+    private int page;
+    private int size;
+    private int total;
 }

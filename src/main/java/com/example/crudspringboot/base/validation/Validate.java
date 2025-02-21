@@ -2,22 +2,31 @@ package com.example.crudspringboot.base.validation;
 
 import com.example.crudspringboot.base.exceptions.BadRequestException;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class Validate {
     // Cek null atau empty tergantung tipe datanya
     public static <T> void c(T object, Map<String, Function<T, ?>> fieldExtractors) {
+        List<String> errors = new ArrayList<>();
+
         for (Map.Entry<String, Function<T, ?>> entry : fieldExtractors.entrySet()) {
             Object value = entry.getValue().apply(object);
 
             if (isNullOrEmpty(value)) {
-                throw new BadRequestException(entry.getKey());
+                errors.add(entry.getKey());
             }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BadRequestException(errors);
         }
     }
 
@@ -45,6 +54,15 @@ public class Validate {
 
     // Cek apakah objek kosong (tidak ada field yang terisi)
     private static boolean isEmptyObject(Object obj) {
-        return obj.getClass().getDeclaredFields().length == 0;
+        try {
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.get(obj) != null) {
+                    return false; // Ada nilai yang diisi, tidak kosong
+                }
+            }
+        } catch (IllegalAccessException ignored) {
+        }
+        return true; // Semua field null, objek kosong
     }
 }

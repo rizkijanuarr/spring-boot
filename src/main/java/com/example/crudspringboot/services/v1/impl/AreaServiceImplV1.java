@@ -1,10 +1,10 @@
 package com.example.crudspringboot.services.v1.impl;
 
-import com.example.crudspringboot.base.exceptions.BadRequestException;
+import com.example.crudspringboot.base.exceptions.NotFoundException;
 import com.example.crudspringboot.base.message.MessageLib;
+import com.example.crudspringboot.base.validation.Validate;
 import com.example.crudspringboot.repositories.AreaRepository;
 import com.example.crudspringboot.repositories.FarmerRepository;
-import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.AreaEntity;
 import com.example.crudspringboot.repositories.entities.CoordinateEntity;
 import com.example.crudspringboot.repositories.entities.FarmerEntity;
@@ -16,14 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AreaServiceImplV1 implements AreaServiceV1 {
     private final AreaRepository areaRepository;
@@ -42,13 +41,21 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
 
     @Override
     public AreaResponseV1 store(AreaRequestV1 req) {
-        FarmerEntity farmer = farmerRepository.findById(req.getFarmer_id())
-                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+        Validate.c(req, Map.of(
+                messageLib.getAreaNameCantNull(), AreaRequestV1::getArea_name,
+                messageLib.getAreaLandCantNull(), AreaRequestV1::getArea_land,
+                messageLib.getFarmerIdNotFound(), AreaRequestV1::getFarmer_id,
+                messageLib.getAreaCoordinatesCantNull(), AreaRequestV1::getCoordinates
+        ));
+
+        FarmerEntity far = farmer(req.getFarmer_id());
 
         AreaEntity areas = new AreaEntity();
         areas.setArea_name(req.getArea_name());
         areas.setArea_land(req.getArea_land());
-        areas.setFarmer(farmer);
+        areas.setFarmer(far);
+        areas.setCreatedBy(getCurentUser());
+        areas.setCreatedDate(getCreatedDate());
 
         List<CoordinateEntity> coordinates = new ArrayList<>();
 
@@ -59,6 +66,8 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                 coordinate.setLat(coordReq.getLat());
                 coordinate.setLng(coordReq.getLng());
                 coordinate.setArea(areas);
+                coordinate.setCreatedBy(areas.getCreatedBy());
+                coordinate.setCreatedDate(areas.getCreatedDate());
 
                 coordinates.add(coordinate);
             }
@@ -70,40 +79,36 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
 
     @Override
     public AreaResponseV1 show(String id) {
-        AreaEntity area = areaRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getAreaNotFound()));
-        return responses(area);
+        AreaEntity ar = area(id);
+        return responses(ar);
     }
 
     @Override
     public AreaResponseV1 update(String id, AreaRequestV1 req) {
-        AreaEntity areas = areaRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getAreaNotFound()));
-        FarmerEntity farmer = farmerRepository.findById(req.getFarmer_id())
-                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+        AreaEntity ar = area(id);
+        FarmerEntity far = farmer(req.getFarmer_id());
 
-        areas.setArea_name(req.getArea_name());
-        areas.setArea_land(req.getArea_land());
-        areas.setFarmer(farmer);
-        areas.setModifiedBy(getModifiedByUpdate());
-        areas.setModifiedDate(getModifiedDate());
+        ar.setArea_name(req.getArea_name());
+        ar.setArea_land(req.getArea_land());
+        ar.setFarmer(far);
+        ar.setModifiedBy(getModifiedByUpdate());
+        ar.setModifiedDate(getModifiedDate());
 
-        AreaEntity updated = areaRepository.save(areas);
+        AreaEntity updated = areaRepository.save(ar);
         return responses(updated);
     }
 
     @Override
     public AreaResponseV1 delete(String id) {
-        AreaEntity areas = areaRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getAreaNotFound()));
+        AreaEntity ar = area(id);
 
-        areas.setDeletedDate(getModifiedDate());
-        areas.setDeletedBy(getCurentUser());
-        areas.setModifiedBy(getModifiedByDelete());
-        areas.setActive(false);
+        ar.setDeletedDate(getModifiedDate());
+        ar.setDeletedBy(getCurentUser());
+        ar.setModifiedBy(getModifiedByDelete());
+        ar.setActive(false);
 
-        areaRepository.save(areas);
-        return responses(areas);
+        areaRepository.save(ar);
+        return responses(ar);
     }
 
     public Slice<AreaResponseV1> getAreaActive(Pageable pageable) {
@@ -164,6 +169,16 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                 .build();
     }
 
+    private AreaEntity area(String id) {
+        return areaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getAreaNotFound()));
+    }
+
+    private FarmerEntity farmer(String id) {
+        return farmerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getFarmerIdNotFound()));
+    }
+
     private String getCurentUser() {
         return "SYSTEM";
     }
@@ -184,7 +199,11 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
         return String.format("PTN-%d-%d", num1, num2);
     }
 
-    private LocalDateTime getModifiedDate() {
-        return LocalDateTime.now();
+    private Date getModifiedDate() {
+        return new Date();
+    }
+
+    private Date getCreatedDate() {
+        return new Date();
     }
 }

@@ -1,16 +1,16 @@
 package com.example.crudspringboot.request.v1;
 
+import com.example.crudspringboot.base.enums.MitraTypeEnum;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 
-import com.example.crudspringboot.repositories.enumaration.MitraTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class MitraRequestV1 {
     private String mitra_code;
     private String mitra_name;

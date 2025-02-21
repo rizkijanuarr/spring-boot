@@ -1,17 +1,18 @@
 package com.example.crudspringboot.request.v1;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class AreaRequestV1 {
     private String area_name;
     private BigDecimal area_land;
@@ -20,8 +21,7 @@ public class AreaRequestV1 {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class CoordinatesReq {
         private Integer seq;
         private Double lat;

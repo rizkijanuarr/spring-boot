@@ -1,97 +1,120 @@
 package com.example.crudspringboot.base.response;
 
+import com.example.crudspringboot.base.enums.ErrorCodeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public class ResponseHelper {
-    public static <T> BaseResponse createBaseResponse(Page<T> data) {
-        return BaseResponse.builder()
-                .data(data.getContent())
-                .pageSize(data.getPageable().getPageSize())
-                .currentPage(data.getPageable().getPageNumber())
-                .totalPage(data.getTotalPages())
-                .totalData(data.getTotalElements())
-                .build();
+    public static ResponseEntity<BaseResponse> buildOkResponse(Object data) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .data(data)
+                .success(true).build();
+
+        return ResponseEntity.ok(mainResponse);
     }
 
-    public static <T> BaseResponse createBaseResponse(Slice<T> data) {
-        return BaseResponse.builder()
+    public static ResponseEntity<BaseResponse> buildOkResponse() {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .success(true).build();
+
+        return ResponseEntity.ok(mainResponse);
+    }
+
+    public static ResponseEntity<BaseResponse> buildOkResponse(String data) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .data(data)
+                .success(true).build();
+
+        return ResponseEntity.ok(mainResponse);
+    }
+
+    public static <T> ResponseEntity<BaseResponsePagination> buildOkResponsePage(Page<T> data) {
+        BaseResponsePagination mainResponse = BaseResponsePagination.builder()
+                .data(data.getContent())
+                .page(data.getNumber())
+                .allElement(data.getTotalElements())
+                .element(data.getSize())
+                .success(true).build();
+
+        return ResponseEntity.ok(mainResponse);
+    }
+
+    public static <T> ResponseEntity<BaseResponseSlice> buildOkeResponse(Slice<T> data) {
+        return ResponseEntity.ok(ResponseHelper.buildSliceResponse(data));
+    }
+
+    public static <T> BaseResponseSlice buildSliceResponse(Slice<T> data) {
+        BaseResponseSlice build = BaseResponseSlice.builder()
+                .data(data.get())
+                .hasNext(data.hasNext())
                 .isFirst(data.isFirst())
                 .isLast(data.isLast())
-                .hasNext(data.hasNext())
-                .data(data.getContent())
-                .totalData(Long.parseLong(String.valueOf(data.getNumberOfElements())))
-                .currentPage(data.getPageable().getPageNumber())
+                .success(true)
+                .size(data.getSize())
+                .page(data.getNumber())
                 .build();
+        return build;
     }
 
-    public static <T> SliceResponseParameter<T> createResponse(Slice<T> data) {
-        SliceResponseParameter<T> sliceResponseParameter = new SliceResponseParameter<>();
-        sliceResponseParameter.setIsFirst(data.isFirst());
-        sliceResponseParameter.setIsLast(data.isLast());
-        sliceResponseParameter.setData(data.getContent());
-        sliceResponseParameter.setTotalData(Long.parseLong(String.valueOf(data.getNumberOfElements())));
-        sliceResponseParameter.setHasNext(data.hasNext());
-        sliceResponseParameter.setCurrentPage(data.getPageable().getPageNumber());
-        return sliceResponseParameter;
-    }
-    public static <T> SliceResponseParameter<T> createResponseSliceCount(Slice<T> data) {
-        SliceResponseParameter<T> sliceResponseParameter = new SliceResponseParameter<>();
-        sliceResponseParameter.setIsFirst(data.isFirst());
-        sliceResponseParameter.setIsLast(data.isLast());
-        sliceResponseParameter.setData(data.getContent());
-        sliceResponseParameter.setTotalData(Long.parseLong(String.valueOf(data.getPageable().getPageSize())));
-        if (data.getContent().isEmpty()){
-            sliceResponseParameter.setTotalData(Long.parseLong(String.valueOf(0)));
-        }
-        sliceResponseParameter.setHasNext(data.hasNext());
-        sliceResponseParameter.setCurrentPage(data.getPageable().getPageNumber());
-        return sliceResponseParameter;
-    }
-
-    public static <T> DataResponseParameter<T> createResponse(T data) {
-        DataResponseParameter<T> sliceResponseParameter = new DataResponseParameter<>();
-        sliceResponseParameter.setData(data);
-        return sliceResponseParameter;
-    }
-
-    public static <T> PageResponseParameter<T> createResponse(Page<T> data) {
-        PageResponseParameter<T> sliceResponseParameter = new PageResponseParameter<>();
-        sliceResponseParameter.setData(data.getContent());
-        sliceResponseParameter.setPageSize(data.getPageable().getPageSize());
-        sliceResponseParameter.setCurrentPage(data.getPageable().getPageNumber());
-        sliceResponseParameter.setTotalPage(data.getTotalPages());
-        sliceResponseParameter.setTotalData(data.getTotalElements());
-        return sliceResponseParameter;
-    }
-    public static <T> ListResponseParameter<T> createResponse(List<T> data) {
-        ListResponseParameter<T> sliceResponseParameter = new ListResponseParameter<>();
-        sliceResponseParameter.setData(data);
-        return sliceResponseParameter;
-    }
-
-    public static <T> BaseResponse createBaseResponse(List<T> data) {
-        return BaseResponse.builder()
+    public static ResponseEntity<BaseResponse> buildCreatedResponse(Object data) {
+        BaseResponse mainResponse = BaseResponse.builder()
                 .data(data)
-                .build();
+                .success(true).build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(mainResponse);
     }
 
-    public static <T> BaseResponse createBaseResponse(T data) {
-        return BaseResponse.builder()
-                .data(data)
-                .build();
+    public static ResponseEntity<BaseResponse> buildNoDataResponse(String message) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .data(message)
+                .success(false).build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mainResponse);
     }
 
-    public static BaseResponse createBaseResponse(String massage) {
-        return BaseResponse.builder()
-                .message(massage)
-                .build();
+    public static ResponseEntity<BaseResponse> buildInternalServerErrorResponse(String message) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .data(message)
+                .success(false).build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mainResponse);
     }
 
-    public static BaseResponse createBaseResponse() {
-        return BaseResponse.builder()
+    public static ResponseEntity<BaseResponse> buildBadRequestResponse(String message) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .success(false)
+                .data(message).build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(mainResponse);
+    }
+
+    public static ResponseEntity<BaseResponse> buildBadRequestResponseWithErrorCode(String message, ErrorCodeEnum errorCodeEnum, String fieldName) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .success(false)
+                .data(message)
+                .errors(List.of(BaseErrorResponse.builder()
+                        .code(errorCodeEnum.getCode())
+                        .description(errorCodeEnum.getDescription())
+                        .field(fieldName)
+                        .build()))
                 .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(mainResponse);
+    }
+
+    public static ResponseEntity<BaseResponse> buildUnauthorizedResponse(String message) {
+        BaseResponse mainResponse = BaseResponse.builder()
+                .success(false)
+                .data(message).build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(mainResponse);
+    }
+    public static <T> ResponseEntity<BaseResponseSlice> buildSliceResponseWithTotalElement(Slice<T> data, int totalElement) {
+        BaseResponseSlice body = ResponseHelper.buildSliceResponse(data);
+        body.setTotal(totalElement);
+        return ResponseEntity.ok(body);
     }
 }

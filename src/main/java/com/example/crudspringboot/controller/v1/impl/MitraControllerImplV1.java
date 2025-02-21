@@ -1,54 +1,57 @@
 package com.example.crudspringboot.controller.v1.impl;
 
-import com.example.crudspringboot.base.response.DataResponseParameter;
-import com.example.crudspringboot.base.response.ListResponseParameter;
+import com.example.crudspringboot.base.response.BaseResponse;
+import com.example.crudspringboot.base.response.BaseResponseSlice;
 import com.example.crudspringboot.base.response.ResponseHelper;
-import com.example.crudspringboot.base.response.SliceResponseParameter;
-import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.MitraControllerV1;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
-import com.example.crudspringboot.response.v1.MitraResponseV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
 
-@BaseControllerImpl
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RestController
 @RequiredArgsConstructor
 public class MitraControllerImplV1 implements MitraControllerV1 {
-    private final MitraServiceV1 mitraService;
+
+    private MitraServiceV1 mitraService;
 
     @Override
-    public ListResponseParameter<MitraResponseV1> index() {
-        return ResponseHelper.createResponse(mitraService.index());
+    public ResponseEntity<BaseResponse> index() {
+        return ResponseHelper.buildOkResponse(mitraService.index());
     }
 
     @Override
-    public DataResponseParameter<MitraResponseV1> store(MitraRequestV1 req) {
-        return ResponseHelper.createResponse(mitraService.store(req));
+    public ResponseEntity<BaseResponse> store(MitraRequestV1 req) {
+        return ResponseHelper.buildOkResponse(mitraService.store(req));
     }
 
     @Override
-    public DataResponseParameter<MitraResponseV1> show(String id) {
-        return ResponseHelper.createResponse(mitraService.show(id));
+    public ResponseEntity<BaseResponse> show(String id) {
+        return ResponseHelper.buildOkResponse(mitraService.show(id));
     }
 
     @Override
-    public DataResponseParameter<MitraResponseV1> update(String id, MitraRequestV1 req) {
-        return ResponseHelper.createResponse(mitraService.update(id, req));
+    public ResponseEntity<BaseResponse> update(String id, MitraRequestV1 req) {
+        return ResponseHelper.buildOkResponse(mitraService.update(id, req));
     }
 
     @Override
-    public DataResponseParameter<MitraResponseV1> delete(String id) {
-        return ResponseHelper.createResponse(mitraService.delete(id));
+    public ResponseEntity<BaseResponse> delete(String id) {
+        return ResponseHelper.buildOkResponse(mitraService.delete(id));
     }
 
     @Override
-    public SliceResponseParameter<MitraResponseV1> getMitraActive(Pageable pageable) {
-        return ResponseHelper.createResponse(mitraService.getMitraActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getMitraActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(mitraService.getMitraActive(pageable));
     }
 
     @Override
-    public SliceResponseParameter<MitraResponseV1> getMitraInActive(Pageable pageable) {
-        return ResponseHelper.createResponse(mitraService.getMitraInActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getMitraInActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(mitraService.getMitraInActive(pageable));
     }
 }

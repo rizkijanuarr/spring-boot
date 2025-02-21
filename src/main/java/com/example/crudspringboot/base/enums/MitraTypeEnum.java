@@ -1,4 +1,4 @@
-package com.example.crudspringboot.repositories.enumaration;
+package com.example.crudspringboot.base.enums;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
 package com.example.crudspringboot.services.v1.impl;
 
-import com.example.crudspringboot.base.exceptions.BadRequestException;
+import com.example.crudspringboot.base.exceptions.NotFoundException;
 import com.example.crudspringboot.base.message.MessageLib;
+import com.example.crudspringboot.base.validation.Validate;
 import com.example.crudspringboot.repositories.FarmerRepository;
 import com.example.crudspringboot.repositories.MitraRepository;
 import com.example.crudspringboot.repositories.entities.FarmerEntity;
@@ -14,13 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FarmerServiceImplV1 implements FarmerServiceV1 {
     private final FarmerRepository farmerRepository;
@@ -39,15 +39,22 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
 
     @Override
     public FarmerResponseV1 store(FarmerRequestV1 req) {
-        MitraEntity mitra = mitraRepository.findById(req.getMitra_id())
-                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
+        Validate.c(req, Map.of(
+                messageLib.getFarmerNameNotFound(), FarmerRequestV1::getFarmer_name,
+                messageLib.getFarmerPhoneNotFound(), FarmerRequestV1::getFarmer_phone,
+                messageLib.getFarmerAddressNotFound(), FarmerRequestV1::getFarmer_address
+        ));
+
+        MitraEntity mit = mitra(req.getMitra_id());
 
         FarmerEntity farmer = new FarmerEntity();
         farmer.setFarmer_code(req.getFarmer_code() != null ? req.getFarmer_code() : generateRandomCode());
         farmer.setFarmer_name(req.getFarmer_name());
         farmer.setFarmer_phone(req.getFarmer_phone());
         farmer.setFarmer_address(req.getFarmer_address());
-        farmer.setMitra(mitra);
+        farmer.setMitra(mit);
+        farmer.setCreatedBy(getCurentUser());
+        farmer.setCreatedDate(getCreatedDate());
 
         FarmerEntity created = farmerRepository.save(farmer);
         return responses(created);
@@ -55,41 +62,37 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
 
     @Override
     public FarmerResponseV1 show(String id) {
-        FarmerEntity farmer = farmerRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
-        return responses(farmer);
+        FarmerEntity far = farmer(id);
+        return responses(far);
     }
 
     @Override
     public FarmerResponseV1 update(String id, FarmerRequestV1 req) {
-        FarmerEntity farmer = farmerRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
-        MitraEntity mitra = mitraRepository.findById(req.getMitra_id())
-                .orElseThrow(() -> new BadRequestException(messageLib.getMitraNotFound()));
+        FarmerEntity far = farmer(id);
+        MitraEntity mit = mitra(id);
 
-        farmer.setFarmer_name(req.getFarmer_name());
-        farmer.setFarmer_phone(req.getFarmer_phone());
-        farmer.setFarmer_address(req.getFarmer_address());
-        farmer.setMitra(mitra);
-        farmer.setModifiedBy(getModifiedByUpdate());
-        farmer.setModifiedDate(getModifiedDate());
+        far.setFarmer_name(req.getFarmer_name());
+        far.setFarmer_phone(req.getFarmer_phone());
+        far.setFarmer_address(req.getFarmer_address());
+        far.setMitra(mit);
+        far.setModifiedBy(getModifiedByUpdate());
+        far.setModifiedDate(getModifiedDate());
 
-        FarmerEntity updated = farmerRepository.save(farmer);
+        FarmerEntity updated = farmerRepository.save(far);
         return responses(updated);
     }
 
     @Override
     public FarmerResponseV1 delete(String id) {
-        FarmerEntity farmer = farmerRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(messageLib.getFarmerNotFound()));
+        FarmerEntity far = farmer(id);
 
-        farmer.setDeletedDate(getModifiedDate());
-        farmer.setDeletedBy(getCurentUser());
-        farmer.setModifiedBy(getModifiedByDelete());
-        farmer.setActive(false);
+        far.setDeletedDate(getModifiedDate());
+        far.setDeletedBy(getCurentUser());
+        far.setModifiedBy(getModifiedByDelete());
+        far.setActive(false);
 
-        farmerRepository.save(farmer);
-        return responses(farmer);
+        farmerRepository.save(far);
+        return responses(far);
     }
 
     @Override
@@ -137,6 +140,16 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
                 .build();
     }
 
+    private FarmerEntity farmer(String id) {
+        return farmerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getFarmerIdNotFound()));
+    }
+
+    private MitraEntity mitra(String id) {
+        return mitraRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
+    }
+
     private String getCurentUser() {
         return "SYSTEM";
     }
@@ -157,8 +170,12 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         return String.format("PTN-%d-%d", num1, num2);
     }
 
-    private LocalDateTime getModifiedDate() {
-        return LocalDateTime.now();
+    private Date getModifiedDate() {
+        return new Date();
+    }
+
+    private Date getCreatedDate() {
+        return new Date();
     }
 
 }

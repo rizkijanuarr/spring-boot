@@ -1,54 +1,56 @@
 package com.example.crudspringboot.controller.v1.impl;
 
-import com.example.crudspringboot.base.response.DataResponseParameter;
-import com.example.crudspringboot.base.response.ListResponseParameter;
+import com.example.crudspringboot.base.response.BaseResponse;
+import com.example.crudspringboot.base.response.BaseResponseSlice;
 import com.example.crudspringboot.base.response.ResponseHelper;
-import com.example.crudspringboot.base.response.SliceResponseParameter;
-import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.FarmerControllerV1;
 import com.example.crudspringboot.request.v1.FarmerRequestV1;
-import com.example.crudspringboot.response.v1.FarmerResponseV1;
 import com.example.crudspringboot.services.v1.FarmerServiceV1;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
 
-@BaseControllerImpl
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RestController
 public class FarmerControllerImplV1 implements FarmerControllerV1 {
-    private final FarmerServiceV1 farmerService;
+
+    @Autowired
+    private FarmerServiceV1 farmerService;
 
     @Override
-    public ListResponseParameter<FarmerResponseV1> index() {
-        return ResponseHelper.createResponse(farmerService.index());
+    public ResponseEntity<BaseResponse> index() {
+        return ResponseHelper.buildOkResponse(farmerService.index());
     }
 
     @Override
-    public DataResponseParameter<FarmerResponseV1> store(FarmerRequestV1 req) {
-        return ResponseHelper.createResponse(farmerService.store(req));
+    public ResponseEntity<BaseResponse> store(FarmerRequestV1 req) {
+        return ResponseHelper.buildOkResponse(farmerService.store(req));
     }
 
     @Override
-    public DataResponseParameter<FarmerResponseV1> show(String id) {
-        return ResponseHelper.createResponse(farmerService.show(id));
+    public ResponseEntity<BaseResponse> show(String id) {
+        return ResponseHelper.buildOkResponse(farmerService.show(id));
     }
 
     @Override
-    public DataResponseParameter<FarmerResponseV1> update(String id, FarmerRequestV1 req) {
-        return ResponseHelper.createResponse(farmerService.update(id, req));
+    public ResponseEntity<BaseResponse> update(String id, FarmerRequestV1 req) {
+        return ResponseHelper.buildOkResponse(farmerService.update(id, req));
     }
 
     @Override
-    public DataResponseParameter<FarmerResponseV1> delete(String id) {
-        return ResponseHelper.createResponse(farmerService.delete(id));
+    public ResponseEntity<BaseResponse> delete(String id) {
+        return ResponseHelper.buildOkResponse(farmerService.delete(id));
     }
 
     @Override
-    public SliceResponseParameter<FarmerResponseV1> getFarmerActive(Pageable pageable) {
-        return ResponseHelper.createResponse(farmerService.getFarmerActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getFarmerActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(farmerService.getFarmerActive(pageable));
     }
 
     @Override
-    public SliceResponseParameter<FarmerResponseV1> getFarmerInActive(Pageable pageable) {
-        return ResponseHelper.createResponse(farmerService.getFarmerInActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getFarmerInActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(farmerService.getFarmerInActive(pageable));
     }
 }

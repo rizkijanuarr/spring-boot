@@ -1,54 +1,56 @@
 package com.example.crudspringboot.controller.v1.impl;
 
-import com.example.crudspringboot.base.response.DataResponseParameter;
-import com.example.crudspringboot.base.response.ListResponseParameter;
+import com.example.crudspringboot.base.response.BaseResponse;
+import com.example.crudspringboot.base.response.BaseResponseSlice;
 import com.example.crudspringboot.base.response.ResponseHelper;
-import com.example.crudspringboot.base.response.SliceResponseParameter;
-import com.example.crudspringboot.controller.advices.BaseControllerImpl;
 import com.example.crudspringboot.controller.v1.AreaControllerV1;
 import com.example.crudspringboot.request.v1.AreaRequestV1;
-import com.example.crudspringboot.response.v1.AreaResponseV1;
 import com.example.crudspringboot.services.v1.AreaServiceV1;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
 
-@BaseControllerImpl
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RestController
 public class AreaControllerImplV1 implements AreaControllerV1 {
-    private final AreaServiceV1 areaServiceV1;
+
+    @Autowired
+    private AreaServiceV1 areaServiceV1;
 
     @Override
-    public ListResponseParameter<AreaResponseV1> index() {
-        return ResponseHelper.createResponse(areaServiceV1.index());
+    public ResponseEntity<BaseResponse> index() {
+        return ResponseHelper.buildOkResponse(areaServiceV1.index());
     }
 
     @Override
-    public DataResponseParameter<AreaResponseV1> store(AreaRequestV1 req) {
-        return ResponseHelper.createResponse(areaServiceV1.store(req));
+    public ResponseEntity<BaseResponse> store(AreaRequestV1 req) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.store(req));
     }
 
     @Override
-    public DataResponseParameter<AreaResponseV1> show(String id) {
-        return ResponseHelper.createResponse(areaServiceV1.show(id));
+    public ResponseEntity<BaseResponse> show(String id) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.show(id));
     }
 
     @Override
-    public DataResponseParameter<AreaResponseV1> update(String id, AreaRequestV1 req) {
-        return ResponseHelper.createResponse(areaServiceV1.update(id, req));
+    public ResponseEntity<BaseResponse> update(String id, AreaRequestV1 req) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.update(id, req));
     }
 
     @Override
-    public DataResponseParameter<AreaResponseV1> delete(String id) {
-        return ResponseHelper.createResponse(areaServiceV1.delete(id));
+    public ResponseEntity<BaseResponse> delete(String id) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.delete(id));
     }
 
     @Override
-    public SliceResponseParameter<AreaResponseV1> getAreaActive(Pageable pageable) {
-        return ResponseHelper.createResponse(areaServiceV1.getAreaActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getAreaActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(areaServiceV1.getAreaActive(pageable));
     }
 
     @Override
-    public SliceResponseParameter<AreaResponseV1> getAreaInActive(Pageable pageable) {
-        return ResponseHelper.createResponse(areaServiceV1.getAreaInActive(pageable));
+    public ResponseEntity<BaseResponseSlice> getAreaInActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(areaServiceV1.getAreaInActive(pageable));
     }
 }

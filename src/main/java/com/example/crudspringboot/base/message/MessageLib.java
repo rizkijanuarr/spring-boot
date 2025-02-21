@@ -17,6 +17,10 @@ public class MessageLib {
         return messageConfig.get("mitra.name.cannot.be.null");
     }
 
+    public String getMitraPhoneCantNull() {
+        return messageConfig.get("mitra.phone.cannot.be.null");
+    }
+
     public String getMitraAddressCantNull() {
         return messageConfig.get("mitra.address.cannot.be.null");
     }
@@ -29,11 +33,35 @@ public class MessageLib {
         return messageConfig.get("mitra.not.found");
     }
 
-    public String getFarmerNotFound() {
-        return messageConfig.get("farmer.not.found");
+    public String getFarmerIdNotFound() {
+        return messageConfig.get("farmer.id.not.found");
+    }
+
+    public String getFarmerNameNotFound() {
+        return messageConfig.get("farmer.name.not.found");
+    }
+
+    public String getFarmerPhoneNotFound() {
+        return messageConfig.get("farmer.phone.not.found");
+    }
+
+    public String getFarmerAddressNotFound() {
+        return messageConfig.get("farmer.address.not.found");
     }
 
     public String getAreaNotFound() {
         return messageConfig.get("area.not.found");
+    }
+
+    public String getAreaNameCantNull() {
+        return messageConfig.get("area.name.not.found");
+    }
+
+    public String getAreaLandCantNull() {
+        return messageConfig.get("area.land.not.found");
+    }
+
+    public String getAreaCoordinatesCantNull() {
+        return messageConfig.get("area.coordinates.not.found");
     }
 }

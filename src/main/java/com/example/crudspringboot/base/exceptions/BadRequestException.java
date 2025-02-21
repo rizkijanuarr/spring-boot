@@ -1,17 +1,25 @@
 package com.example.crudspringboot.base.exceptions;
 
-import com.example.crudspringboot.base.constant.ErrorCodeEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.List;
+
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {
-  public BadRequestException(String msg) {
-    super(msg);
+  private final List<String> errors;
+
+  public BadRequestException(List<String> errors) {
+    super(String.join(", ", errors));
+    this.errors = errors;
   }
 
-  public BadRequestException(ErrorCodeEnum errorCodeEnum){
-    super(errorCodeEnum.toString());
+  public BadRequestException(String error) {
+    super(error);
+    this.errors = List.of(error);
   }
 
+  public List<String> getErrors() {
+    return errors;
+  }
 }

@@ -3,17 +3,20 @@ package com.example.crudspringboot.repositories.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
 @MappedSuperclass
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @DynamicUpdate
-@Data
 public class BaseEntity {
+
     @Id
     @Column(name = "id")
     private String id;
@@ -25,13 +28,13 @@ public class BaseEntity {
 
     @Column(name = "created_date")
     @NotNull
-    private LocalDateTime createdDate;
+    private Date createdDate;
 
     @Column(name = "modified_date")
-    private LocalDateTime modifiedDate;
+    private Date modifiedDate;
 
     @Column(name = "deleted_date")
-    private LocalDateTime deletedDate;
+    private Date deletedDate;
 
     @Column(name = "created_by")
     @NotNull
@@ -47,18 +50,17 @@ public class BaseEntity {
     public void prePersist() {
         this.id = UUID.randomUUID().toString();
         this.active = true;
-        this.createdDate = LocalDateTime.now();
-        this.createdBy = "SYSTEM";
+        this.createdDate = new Date();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.modifiedDate = LocalDateTime.now();
+        this.modifiedDate = new Date();
     }
 
     @PreRemove
     public void preRemove() {
-        this.deletedDate = LocalDateTime.now();
+        this.deletedDate = new Date();
         this.active = false;
     }
 }
