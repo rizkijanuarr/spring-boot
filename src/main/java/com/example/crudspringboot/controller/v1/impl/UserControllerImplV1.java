@@ -38,4 +38,9 @@ public class UserControllerImplV1 implements UserControllerV1 {
         return ResponseHelper.buildOkResponse(userService.update(id, req));
     }
 
+    @Override
+    public ResponseEntity<BaseResponse> delete(String id) {
+        return ResponseHelper.buildOkResponse(userService.delete(id));
+    }
+
 }

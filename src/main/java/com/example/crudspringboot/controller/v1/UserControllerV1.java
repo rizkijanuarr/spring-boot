@@ -22,4 +22,7 @@ public interface UserControllerV1 {
     @PutMapping("/{id}")
     ResponseEntity<BaseResponse> update(@PathVariable("id") String id, @RequestBody UserRequestV1 req);
 
+    @DeleteMapping("/{id}")
+    ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+
 }

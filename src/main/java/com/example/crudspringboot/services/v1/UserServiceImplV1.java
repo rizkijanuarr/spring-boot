@@ -74,6 +74,19 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return responses(updated);
     }
 
+    @Override
+    public UserResponseV1 delete(String id) {
+        UserEntity us = user(id);
+
+        us.setDeletedDate(getModifiedDate());
+        us.setDeletedBy(getCurentUser());
+        us.setModifiedBy(getModifiedByDelete());
+        us.setActive(false);
+
+        userRepository.save(us);
+        return responses(us);
+    }
+
     private UserResponseV1 responses(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())
