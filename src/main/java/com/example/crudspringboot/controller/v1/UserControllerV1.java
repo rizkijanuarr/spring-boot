@@ -30,4 +30,7 @@ public interface UserControllerV1 {
     @GetMapping("list/ACTIVE")
     ResponseEntity<BaseResponseSlice> getUsersActive(Pageable pageable);
 
+    @GetMapping("list/INACTIVE")
+    ResponseEntity<BaseResponseSlice> getUsersInActive(Pageable pageable);
+
 }

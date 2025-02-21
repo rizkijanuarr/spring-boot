@@ -12,4 +12,5 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<UserEntity, String> {
     List<UserEntity> findAllByOrderByCreatedDateDesc();
     Slice<UserEntity> findAllByActiveTrueOrderByCreatedDateDesc(Pageable pageable);
+    Slice<UserEntity> findAllByActiveFalseOrderByCreatedDateDesc(Pageable pageable);
 }

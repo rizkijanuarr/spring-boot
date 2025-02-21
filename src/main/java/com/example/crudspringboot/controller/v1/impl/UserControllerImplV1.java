@@ -49,4 +49,9 @@ public class UserControllerImplV1 implements UserControllerV1 {
     public ResponseEntity<BaseResponseSlice> getUsersActive(Pageable pageable) {
         return ResponseHelper.buildOkeResponse(userService.getUsersActive(pageable));
     }
+
+    @Override
+    public ResponseEntity<BaseResponseSlice> getUsersInActive(Pageable pageable) {
+        return ResponseHelper.buildOkeResponse(userService.getUsersInActive(pageable));
+    }
 }

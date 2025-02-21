@@ -17,4 +17,5 @@ public interface UserServiceV1 {
     UserResponseV1 delete(String id);
 
     Slice<UserResponseV1> getUsersActive(Pageable pageable);
+    Slice<UserResponseV1> getUsersInActive(Pageable pageable);
 }

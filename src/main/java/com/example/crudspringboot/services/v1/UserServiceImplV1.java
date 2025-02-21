@@ -102,6 +102,18 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return new SliceImpl<>(responses, pageable, usersList.hasNext());
     }
 
+    @Override
+    public Slice<UserResponseV1> getUsersInActive(Pageable pageable) {
+        Slice<UserEntity> usersList = userRepository.findAllByActiveFalseOrderByCreatedDateDesc(pageable);
+        List<UserResponseV1> responses = new ArrayList<>();
+
+        for (UserEntity user : usersList) {
+            responses.add(responses(user));
+        }
+
+        return new SliceImpl<>(responses, pageable, usersList.hasNext());
+    }
+
     private UserResponseV1 responses(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())
