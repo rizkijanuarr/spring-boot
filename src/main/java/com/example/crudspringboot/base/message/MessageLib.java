@@ -64,4 +64,8 @@ public class MessageLib {
     public String getAreaCoordinatesCantNull() {
         return messageConfig.get("area.coordinates.not.found");
     }
+
+    public String getUserIdNotFound() {
+        return messageConfig.get("user.id.not.found");
+    }
 }
