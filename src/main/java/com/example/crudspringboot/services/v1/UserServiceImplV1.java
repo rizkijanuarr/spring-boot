@@ -59,6 +59,21 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return responses(us);
     }
 
+    @Override
+    public UserResponseV1 update(String id, UserRequestV1 req) {
+        UserEntity us = user(id);
+
+        us.setUser_name(req.getUser_name());
+        us.setUser_email(req.getUser_email());
+        us.setUser_password(req.getUser_password());
+        us.setUser_phone(req.getUser_phone());
+        us.setModifiedBy(getModifiedByUpdate());
+        us.setModifiedDate(getModifiedDate());
+
+        UserEntity updated = userRepository.save(us);
+        return responses(updated);
+    }
+
     private UserResponseV1 responses(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())

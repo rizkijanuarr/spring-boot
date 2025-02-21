@@ -11,5 +11,6 @@ public interface UserServiceV1 {
     List<UserResponseV1> index();
     UserResponseV1 store(UserRequestV1 req);
     UserResponseV1 show(String id);
+    UserResponseV1 update(String id, UserRequestV1 req);
 
 }

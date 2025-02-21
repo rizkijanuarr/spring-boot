@@ -33,4 +33,9 @@ public class UserControllerImplV1 implements UserControllerV1 {
         return ResponseHelper.buildOkResponse(userService.show(id));
     }
 
+    @Override
+    public ResponseEntity<BaseResponse> update(String id, UserRequestV1 req) {
+        return ResponseHelper.buildOkResponse(userService.update(id, req));
+    }
+
 }
