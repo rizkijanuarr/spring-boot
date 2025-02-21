@@ -17,4 +17,7 @@ public interface UserControllerV1 {
     @PostMapping
     ResponseEntity<BaseResponse> store(@Valid @RequestBody UserRequestV1 req);
 
+    @GetMapping("/{id}")
+    ResponseEntity<BaseResponse> show(@PathVariable("id") String id);
+
 }

@@ -53,6 +53,12 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return responses(created);
     }
 
+    @Override
+    public UserResponseV1 show(String id) {
+        UserEntity us = user(id);
+        return responses(us);
+    }
+
     private UserResponseV1 responses(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())
