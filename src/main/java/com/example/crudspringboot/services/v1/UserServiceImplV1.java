@@ -2,8 +2,10 @@ package com.example.crudspringboot.services.v1;
 
 import com.example.crudspringboot.base.exceptions.NotFoundException;
 import com.example.crudspringboot.base.message.MessageLib;
+import com.example.crudspringboot.base.validation.Validate;
 import com.example.crudspringboot.repositories.UserRepository;
 import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.request.v1.UserRequestV1;
 import com.example.crudspringboot.response.v1.UserResponseV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -29,6 +32,25 @@ public class UserServiceImplV1 implements UserServiceV1 {
             responses.add(responses(user));
         }
         return responses;
+    }
+
+    @Override
+    public UserResponseV1 store(UserRequestV1 req) {
+        Validate.c(req, Map.of(
+                messageLib.getUserNameCantNull(), UserRequestV1::getUser_name,
+                messageLib.getUserEmailCantNull(), UserRequestV1::getUser_email,
+                messageLib.getUserPasswordCantNull(), UserRequestV1::getUser_password
+        ));
+        UserEntity user = new UserEntity();
+        user.setUser_name(req.getUser_name());
+        user.setUser_email(req.getUser_email());
+        user.setUser_password(req.getUser_password());
+        user.setUser_phone(req.getUser_phone());
+        user.setCreatedBy(getCurentUser());
+        user.setCreatedDate(getCreatedDate());
+
+        UserEntity created = userRepository.save(user);
+        return responses(created);
     }
 
     private UserResponseV1 responses(UserEntity entity) {

@@ -68,4 +68,16 @@ public class MessageLib {
     public String getUserIdNotFound() {
         return messageConfig.get("user.id.not.found");
     }
+
+    public String getUserNameCantNull() {
+        return messageConfig.get("user.name.cannot.be.null");
+    }
+
+    public String getUserEmailCantNull() {
+        return messageConfig.get("user.email.cannot.be.null");
+    }
+
+    public String getUserPasswordCantNull() {
+        return messageConfig.get("user.password.cannot.be.null");
+    }
 }
