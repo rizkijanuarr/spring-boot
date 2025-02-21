@@ -30,7 +30,7 @@ public class DateUtil {
     // BOSS!
     public static String convertDateToString(Date date, String pattern) {
         if (date == null) {
-            return "-";
+            return null;
         }
         SimpleDateFormat p = new SimpleDateFormat(pattern, new Locale("id", "ID"));
         return p.format(date);

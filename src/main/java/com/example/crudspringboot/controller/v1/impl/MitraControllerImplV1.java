@@ -7,7 +7,6 @@ import com.example.crudspringboot.controller.v1.MitraControllerV1;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.services.v1.MitraServiceV1;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MitraControllerImplV1 implements MitraControllerV1 {
 
-    private MitraServiceV1 mitraService;
+    private final MitraServiceV1 mitraService;
 
     @Override
     public ResponseEntity<BaseResponse> index() {

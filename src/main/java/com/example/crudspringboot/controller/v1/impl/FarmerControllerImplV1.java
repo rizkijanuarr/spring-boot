@@ -6,7 +6,7 @@ import com.example.crudspringboot.base.response.ResponseHelper;
 import com.example.crudspringboot.controller.v1.FarmerControllerV1;
 import com.example.crudspringboot.request.v1.FarmerRequestV1;
 import com.example.crudspringboot.services.v1.FarmerServiceV1;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
+@RequiredArgsConstructor
 public class FarmerControllerImplV1 implements FarmerControllerV1 {
 
-    @Autowired
-    private FarmerServiceV1 farmerService;
+    private final FarmerServiceV1 farmerService;
 
     @Override
     public ResponseEntity<BaseResponse> index() {

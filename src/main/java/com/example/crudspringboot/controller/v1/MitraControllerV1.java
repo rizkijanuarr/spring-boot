@@ -3,6 +3,7 @@ package com.example.crudspringboot.controller.v1;
 import com.example.crudspringboot.base.response.BaseResponse;
 import com.example.crudspringboot.base.response.BaseResponseSlice;
 import com.example.crudspringboot.request.v1.MitraRequestV1;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public interface MitraControllerV1 {
     ResponseEntity<BaseResponse> index();
 
     @PostMapping
-    ResponseEntity<BaseResponse> store(@RequestBody MitraRequestV1 req);
+    ResponseEntity<BaseResponse> store(@Valid @RequestBody MitraRequestV1 req);
 
     @GetMapping("/{id}")
     ResponseEntity<BaseResponse> show(@PathVariable("id") String id);

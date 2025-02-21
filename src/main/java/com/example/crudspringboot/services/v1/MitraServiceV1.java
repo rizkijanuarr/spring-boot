@@ -4,6 +4,7 @@ import com.example.crudspringboot.request.v1.MitraRequestV1;
 import com.example.crudspringboot.response.v1.MitraResponseV1;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

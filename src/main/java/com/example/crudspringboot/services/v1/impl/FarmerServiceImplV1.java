@@ -69,7 +69,7 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
     @Override
     public FarmerResponseV1 update(String id, FarmerRequestV1 req) {
         FarmerEntity far = farmer(id);
-        MitraEntity mit = mitra(id);
+        MitraEntity mit = mitraID(req);
 
         far.setFarmer_name(req.getFarmer_name());
         far.setFarmer_phone(req.getFarmer_phone());
@@ -147,6 +147,11 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
 
     private MitraEntity mitra(String id) {
         return mitraRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
+    }
+
+    private MitraEntity mitraID(FarmerRequestV1 req) {
+        return mitraRepository.findById(req.getMitra_id())
                 .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
     }
 

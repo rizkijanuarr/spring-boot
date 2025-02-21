@@ -6,7 +6,7 @@ import com.example.crudspringboot.base.response.ResponseHelper;
 import com.example.crudspringboot.controller.v1.AreaControllerV1;
 import com.example.crudspringboot.request.v1.AreaRequestV1;
 import com.example.crudspringboot.services.v1.AreaServiceV1;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
+@RequiredArgsConstructor
 public class AreaControllerImplV1 implements AreaControllerV1 {
 
-    @Autowired
-    private AreaServiceV1 areaServiceV1;
+    private final AreaServiceV1 areaServiceV1;
 
     @Override
     public ResponseEntity<BaseResponse> index() {
