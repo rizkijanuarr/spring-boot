@@ -5,6 +5,9 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.crudspringboot.core.configs.constant.ConstantHeader;
+import com.example.crudspringboot.core.configs.constant.ConstantSecurity;
+import com.example.crudspringboot.core.repositories.UserRepository;
+import com.example.crudspringboot.core.repositories.entities.UserEntity;
 import com.example.crudspringboot.core.services.v1.UserServiceV1;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,12 +15,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.example.crudspringboot.core.configs.constant.ConstantSecurity.BEARER_TOKEN_PREFIX;
 import static com.example.crudspringboot.core.configs.constant.ConstantSecurity.SECRET;
@@ -26,58 +34,50 @@ import static com.example.crudspringboot.core.configs.constant.ConstantSecurity.
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final UserServiceV1 userDetailsService;  // Service untuk load user
+    private final JwtUtil jwtUtils;
+    private final UserRepository userRepository;
+    private final String HEADER_AUTH = ConstantHeader.HEADER_AUTH;
+    private final String BEARER_TOKEN = BEARER_TOKEN_PREFIX;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest req,
-            HttpServletResponse response,
-            FilterChain chain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        String header = request.getHeader(ConstantHeader.HEADER_AUTH);
+        System.out.println("Header Authorization: " + header); // Cek header masuk atau tidak
 
-        String token = req.getHeader(ConstantHeader.HEADER_AUTH); // Ambil token dari header
-
-        // Skip jika tidak ada token
-        if (token == null || !token.startsWith(BEARER_TOKEN_PREFIX)) {
-            chain.doFilter(req, response);
+        if (header == null || !header.startsWith(ConstantSecurity.BEARER_TOKEN_PREFIX)) {
+            System.out.println("Token tidak ditemukan atau salah format!");
+            chain.doFilter(request, response);
             return;
         }
 
-        String token1 = token.substring(7); // Hapus prefix "Bearer "
+        String token = header.replace(ConstantSecurity.BEARER_TOKEN_PREFIX, "");
+        System.out.println("Extracted Token: " + token); // Cek apakah token berhasil diekstrak
+        String email = jwtUtils.validateToken(token);
+        System.out.println("Decoded Email: " + email); // Cek apakah email berhasil diekstrak dari token
 
-        try {
-            System.out.println("Token yang akan diverifikasi: " + token1);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserEntity account = userRepository.login(email).orElse(null);
 
-            // Verify token
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
-            DecodedJWT jwt = verifier.verify(token1);
+            if (account != null) {
+                System.out.println("User ditemukan: " + account.getUser_email()); // Pastikan user ditemukan
 
-            System.out.println("Token berhasil diverifikasi!");
+                String roleName = "ROLE_" + account.getRole().getName().name();
+                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));
 
-            // Ambil data dari token
-            String email = jwt.getSubject();
-            String userId = jwt.getClaim("user_id").asString();
+                // Debugging
+                System.out.println("User Authorities: " + authorities);
 
-            // Set ke request attributes
-            req.setAttribute(ConstantHeader.HEADER_X_ID, userId);
-            req.setAttribute(ConstantHeader.HEADER_X_WHO, email);
+                UserDetails userDetails = new User(account.getUser_email(), account.getUser_password(), authorities);
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            System.out.println("Email dari token: " + email);
-            System.out.println("User_id dari token: " + userId);
-
-            // Set authentication
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // Lanjut ke filter berikutnya
-            chain.doFilter(req, response);
-
-        } catch (Exception e) {
-            System.out.println("Error verifikasi token: " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            return;
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("Authentication Set: " + SecurityContextHolder.getContext().getAuthentication());
+            }
         }
+
+        chain.doFilter(request, response);
     }
 }

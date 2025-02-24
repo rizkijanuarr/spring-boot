@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,11 +24,9 @@ public class UserServiceV1 implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity user = userRepository.login(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+        UserEntity account = userRepository.login(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
-        return new User(user.getUser_email(), user.getUser_password(), authorities);
+        return new User(account.getUser_email(), account.getUser_password(), Collections.emptyList());
     }
 }

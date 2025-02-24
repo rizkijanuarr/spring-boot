@@ -30,5 +30,9 @@ public class UserEntity extends BaseEntity {
     @Column(name = "user_phone", nullable = true)
     private String user_phone;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
+
 }
 

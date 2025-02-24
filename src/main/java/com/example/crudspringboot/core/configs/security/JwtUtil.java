@@ -1,6 +1,8 @@
 package com.example.crudspringboot.core.configs.security;
 
+import com.example.crudspringboot.core.configs.constant.ConstantHeader;
 import com.example.crudspringboot.core.configs.constant.ConstantSecurity;
+import com.example.crudspringboot.core.repositories.entities.UserEntity;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import com.auth0.jwt.JWT;
@@ -13,42 +15,43 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
-    private static final String SECRET_KEY = ConstantSecurity.SECRET;
-    private static final long EXPIRATION_TIME = ConstantSecurity.EXPIRATION_TIME;
-    private static final String ISSUER = ConstantSecurity.NAME_APP;
+    private final String secret = ConstantSecurity.SECRET;
+    private final long expirationTime = ConstantSecurity.EXPIRATION_TIME;
+    private final String X_WHO = ConstantHeader.HEADER_X_WHO;
+    private final String X_ROLE = ConstantHeader.HEADER_X_ROLE;
 
-    // Generate token baru
-    public String generateToken(String userEmail, String userId) {
+    // Generate JWT Token
+    public String generateToken(UserEntity user) {
         return JWT.create()
-                .withSubject(userEmail)  // Set email sebagai subject
-                .withClaim("user_id", userId) // Tambah custom claim with user_id
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .withIssuer(ISSUER)
-                .sign(Algorithm.HMAC256(SECRET_KEY));
+                .withSubject(user.getUser_email())
+                .withClaim("id", user.getId())
+                .withClaim("user_name", user.getUser_name())
+                .withClaim("role", user.getRole().getName().name())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + ConstantSecurity.EXPIRATION_TIME))
+                .sign(Algorithm.HMAC256(ConstantSecurity.SECRET));
     }
 
-    // Validasi token
-    public boolean validateToken(String token) {
+    // Validate JWT Token
+    public String validateToken(String token) {
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET_KEY))
-                    .withIssuer(ISSUER)
-                    .build();
-            verifier.verify(token);
-            return true;
+            return JWT.require(Algorithm.HMAC256(ConstantSecurity.SECRET))
+                    .build()
+                    .verify(token)
+                    .getSubject();
         } catch (JWTVerificationException e) {
-            log.error("JWT Verification Failed: {}", e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    // Ambil email dari token
-    public String getUserEmailFromToken(String token) {
-        return JWT.require(Algorithm.HMAC256(SECRET_KEY))
-                .withIssuer(ISSUER)
+    public String getClaim(String token, String claim) {
+        return JWT.require(Algorithm.HMAC256(ConstantSecurity.SECRET))
                 .build()
                 .verify(token)
-                .getSubject();
+                .getClaim(claim)
+                .asString();
     }
+
 }
 
 

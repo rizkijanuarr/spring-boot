@@ -5,6 +5,7 @@ import com.example.crudspringboot.core.response.base.BaseResponseSlice;
 import com.example.crudspringboot.maxxitaniapps.request.v1.MitraRequestV1;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 public interface MitraControllerV1 {
 
     @GetMapping
+    @PreAuthorize("hasRole('SUPER_FO')")
     ResponseEntity<BaseResponse> index();
 
     @PostMapping
