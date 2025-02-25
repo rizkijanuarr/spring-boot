@@ -138,6 +138,8 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                 .id(entity.getId())
                 .area_name(entity.getArea_name())
                 .area_land(entity.getArea_land())
+                .farmer_id(entity.getFarmer().getId()) // 2 table
+                .mitra_id(entity.getFarmer().getMitra().getId()) // 3 table
                 .farmer(AreaResponseV1.FarmerResponse.builder()
                         .id(entity.getFarmer().getId())
                         .farmer_code(entity.getFarmer().getFarmer_code())

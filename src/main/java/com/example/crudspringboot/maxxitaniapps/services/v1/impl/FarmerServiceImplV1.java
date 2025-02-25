@@ -126,7 +126,8 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
                 .farmer_name(entity.getFarmer_name())
                 .farmer_phone(entity.getFarmer_phone())
                 .farmer_address(entity.getFarmer_address())
-                .mitra(FarmerResponseV1.MitraResponse.builder()
+                .mitra_id(entity.getMitra().getId()) // ini berupa string
+                .mitra(FarmerResponseV1.MitraResponse.builder() // ini berupa object
                         .id(entity.getMitra().getId())
                         .mitra_name(entity.getMitra().getMitra_name())
                         .mitra_code(entity.getMitra().getMitra_code())

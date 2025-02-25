@@ -12,10 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AreaRequestV1 {
-    private String area_name;
-    private BigDecimal area_land;
-    private String farmer_id;
-    private List<CoordinatesReq> coordinates;
+    private String area_name; // table utama
+    private BigDecimal area_land; // table utama
+    private String farmer_id; // table lain
+    private List<CoordinatesReq> coordinates; // beda table tapi coordinates CRUD nya gak melalui sana akan tetapi melalui disini ketika Create AREA
 
     @Data
     @Builder
