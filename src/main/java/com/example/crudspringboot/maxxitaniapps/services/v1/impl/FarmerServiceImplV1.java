@@ -37,27 +37,6 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         return responses;
     }
 
-    private FarmerEntity setFarmerInDatabase(FarmerRequestV1 req) {
-        Validate.c(req, Map.of(
-                messageLib.getFarmerNameNotFound(), FarmerRequestV1::getFarmer_name,
-                messageLib.getFarmerPhoneNotFound(), FarmerRequestV1::getFarmer_phone,
-                messageLib.getFarmerAddressNotFound(), FarmerRequestV1::getFarmer_address
-        ));
-
-        MitraEntity mit = setMitraRelationID(req);
-
-        FarmerEntity farmer = new FarmerEntity();
-        farmer.setFarmer_code(req.getFarmer_code() != null ? req.getFarmer_code() : generateRandomCode());
-        farmer.setFarmer_name(req.getFarmer_name());
-        farmer.setFarmer_phone(req.getFarmer_phone());
-        farmer.setFarmer_address(req.getFarmer_address());
-        farmer.setMitra(mit);
-        farmer.setCreatedBy(getCurentUser());
-        farmer.setCreatedDate(getCreatedDate());
-
-        return farmerRepository.save(farmer);
-    }
-
     @Override
     public FarmerResponseV1 createFarmer(FarmerRequestV1 req) {
         return mapFarmerToResponse(setFarmerInDatabase(req));
@@ -100,6 +79,27 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         }
 
         return new SliceImpl<>(responses, pageable, farmerList.hasNext());
+    }
+
+    private FarmerEntity setFarmerInDatabase(FarmerRequestV1 req) {
+        Validate.c(req, Map.of(
+                messageLib.getFarmerNameNotFound(), FarmerRequestV1::getFarmer_name,
+                messageLib.getFarmerPhoneNotFound(), FarmerRequestV1::getFarmer_phone,
+                messageLib.getFarmerAddressNotFound(), FarmerRequestV1::getFarmer_address
+        ));
+
+        MitraEntity mit = setMitraRelationID(req);
+
+        FarmerEntity farmer = new FarmerEntity();
+        farmer.setFarmer_code(req.getFarmer_code() != null ? req.getFarmer_code() : generateRandomCode());
+        farmer.setFarmer_name(req.getFarmer_name());
+        farmer.setFarmer_phone(req.getFarmer_phone());
+        farmer.setFarmer_address(req.getFarmer_address());
+        farmer.setMitra(mit);
+        farmer.setCreatedBy(getCurentUser());
+        farmer.setCreatedDate(getCreatedDate());
+
+        return farmerRepository.save(farmer);
     }
 
     private FarmerResponseV1 mapFarmerToResponse(FarmerEntity entity) {

@@ -20,28 +20,28 @@ public class AreaControllerImplV1 implements AreaControllerV1 {
     private final AreaServiceV1 areaServiceV1;
 
     @Override
-    public ResponseEntity<BaseResponse> index() {
-        return ResponseHelper.buildOkResponse(areaServiceV1.index());
+    public ResponseEntity<BaseResponse> getListArea() {
+        return ResponseHelper.buildOkResponse(areaServiceV1.getListArea());
     }
 
     @Override
-    public ResponseEntity<BaseResponse> store(AreaRequestV1 req) {
-        return ResponseHelper.buildOkResponse(areaServiceV1.store(req));
+    public ResponseEntity<BaseResponse> createArea(AreaRequestV1 req) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.createArea(req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> show(String id) {
-        return ResponseHelper.buildOkResponse(areaServiceV1.show(id));
+    public ResponseEntity<BaseResponse> detailArea(String id) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.detailArea(id));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> update(String id, AreaRequestV1 req) {
-        return ResponseHelper.buildOkResponse(areaServiceV1.update(id, req));
+    public ResponseEntity<BaseResponse> updateArea(String id, AreaRequestV1 req) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.updateArea(id, req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> delete(String id) {
-        return ResponseHelper.buildOkResponse(areaServiceV1.delete(id));
+    public ResponseEntity<BaseResponse> deleteArea(String id) {
+        return ResponseHelper.buildOkResponse(areaServiceV1.deleteArea(id));
     }
 
     @Override

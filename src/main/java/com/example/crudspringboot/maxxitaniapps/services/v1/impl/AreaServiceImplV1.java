@@ -8,7 +8,9 @@ import com.example.crudspringboot.maxxitaniapps.repositories.FarmerRepository;
 import com.example.crudspringboot.maxxitaniapps.repositories.entities.AreaEntity;
 import com.example.crudspringboot.maxxitaniapps.repositories.entities.CoordinateEntity;
 import com.example.crudspringboot.maxxitaniapps.repositories.entities.FarmerEntity;
+import com.example.crudspringboot.maxxitaniapps.repositories.entities.MitraEntity;
 import com.example.crudspringboot.maxxitaniapps.request.v1.AreaRequestV1;
+import com.example.crudspringboot.maxxitaniapps.request.v1.FarmerRequestV1;
 import com.example.crudspringboot.maxxitaniapps.response.v1.AreaResponseV1;
 import com.example.crudspringboot.maxxitaniapps.services.v1.AreaServiceV1;
 import lombok.RequiredArgsConstructor;
@@ -30,85 +32,36 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
     private final MessageLib messageLib;
 
     @Override
-    public List<AreaResponseV1> index() {
+    public List<AreaResponseV1> getListArea() {
         List<AreaEntity> areas = areaRepository.findAllByOrderByCreatedDateDesc();
         List<AreaResponseV1> responses = new ArrayList<>();
         for (AreaEntity area : areas) {
-            responses.add(responses(area));
+            responses.add(mapAreaToResponse(area));
         }
         return responses;
     }
 
     @Override
-    public AreaResponseV1 store(AreaRequestV1 req) {
-        Validate.c(req, Map.of(
-                messageLib.getAreaNameCantNull(), AreaRequestV1::getArea_name,
-                messageLib.getAreaLandCantNull(), AreaRequestV1::getArea_land,
-                messageLib.getFarmerIdNotFound(), AreaRequestV1::getFarmer_id,
-                messageLib.getAreaCoordinatesCantNull(), AreaRequestV1::getCoordinates
-        ));
-
-        FarmerEntity far = farmer(req.getFarmer_id());
-
-        AreaEntity areas = new AreaEntity();
-        areas.setArea_name(req.getArea_name());
-        areas.setArea_land(req.getArea_land());
-        areas.setFarmer(far);
-        areas.setCreatedBy(getCurentUser());
-        areas.setCreatedDate(getCreatedDate());
-
-        List<CoordinateEntity> coordinates = new ArrayList<>();
-
-        if (req.getCoordinates() != null) {
-            for (AreaRequestV1.CoordinatesReq coordReq : req.getCoordinates()) {
-                CoordinateEntity coordinate = new CoordinateEntity();
-                coordinate.setSeq(coordReq.getSeq());
-                coordinate.setLat(coordReq.getLat());
-                coordinate.setLng(coordReq.getLng());
-                coordinate.setArea(areas);
-                coordinate.setCreatedBy(areas.getCreatedBy());
-                coordinate.setCreatedDate(areas.getCreatedDate());
-
-                coordinates.add(coordinate);
-            }
-        }
-        areas.setCoordinates(coordinates);
-        AreaEntity created = areaRepository.save(areas);
-        return responses(created);
+    public AreaResponseV1 createArea(AreaRequestV1 req) {
+        AreaEntity areaCreate = setAreaInDatabase(req);
+        return mapAreaToResponse(areaCreate);
     }
 
     @Override
-    public AreaResponseV1 show(String id) {
-        AreaEntity ar = area(id);
-        return responses(ar);
+    public AreaResponseV1 detailArea(String id) {
+        AreaEntity areaById = findAreaById(id);
+        return mapAreaToResponse(areaById);
     }
 
     @Override
-    public AreaResponseV1 update(String id, AreaRequestV1 req) {
-        AreaEntity ar = area(id);
-        FarmerEntity far = farmer(req.getFarmer_id());
-
-        ar.setArea_name(req.getArea_name());
-        ar.setArea_land(req.getArea_land());
-        ar.setFarmer(far);
-        ar.setModifiedBy(getModifiedByUpdate());
-        ar.setModifiedDate(getModifiedDate());
-
-        AreaEntity updated = areaRepository.save(ar);
-        return responses(updated);
+    public AreaResponseV1 updateArea(String id, AreaRequestV1 req) {
+        return mapAreaToResponse(setAreaUpdateInDatabase(id, req));
     }
 
     @Override
-    public AreaResponseV1 delete(String id) {
-        AreaEntity ar = area(id);
-
-        ar.setDeletedDate(getModifiedDate());
-        ar.setDeletedBy(getCurentUser());
-        ar.setModifiedBy(getModifiedByDelete());
-        ar.setActive(false);
-
-        areaRepository.save(ar);
-        return responses(ar);
+    public AreaResponseV1 deleteArea(String id) {
+        AreaEntity deletedArea = setSoftDeleteAreaInDatabase(id);
+        return mapAreaToResponse(deletedArea);
     }
 
     public Slice<AreaResponseV1> getAreaActive(Pageable pageable) {
@@ -116,7 +69,7 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
         List<AreaResponseV1> responses = new ArrayList<>();
 
         for (AreaEntity area : areaList) {
-            responses.add(responses(area));
+            responses.add(mapAreaToResponse(area));
         }
 
         return new SliceImpl<>(responses, pageable, areaList.hasNext());
@@ -127,13 +80,37 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
         List<AreaResponseV1> responses = new ArrayList<>();
 
         for (AreaEntity area : areaList) {
-            responses.add(responses(area));
+            responses.add(mapAreaToResponse(area));
         }
 
         return new SliceImpl<>(responses, pageable, areaList.hasNext());
     }
 
-    private AreaResponseV1 responses(AreaEntity entity) {
+    private AreaEntity setAreaUpdateInDatabase(String id, AreaRequestV1 req) {
+        AreaEntity areaById = findAreaById(id);
+        FarmerEntity farmerById = setFarmerRelationID(req.getFarmer_id());
+
+        areaById.setArea_name(req.getArea_name());
+        areaById.setArea_land(req.getArea_land());
+        areaById.setFarmer(farmerById);
+        areaById.setModifiedBy(getModifiedByUpdate());
+        areaById.setModifiedDate(getModifiedDate());
+
+        return areaRepository.save(areaById);
+    }
+
+    private AreaEntity setSoftDeleteAreaInDatabase(String id) {
+        AreaEntity areaById = findAreaById(id);
+
+        areaById.setDeletedDate(getModifiedDate());
+        areaById.setDeletedBy(getCurentUser());
+        areaById.setModifiedBy(getModifiedByDelete());
+        areaById.setActive(false);
+
+        return areaRepository.save(areaById);
+    }
+
+    private AreaResponseV1 mapAreaToResponse(AreaEntity entity) {
         return AreaResponseV1.builder()
                 .id(entity.getId())
                 .area_name(entity.getArea_name())
@@ -171,12 +148,47 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                 .build();
     }
 
-    private AreaEntity area(String id) {
+    private AreaEntity setAreaInDatabase(AreaRequestV1 req) {
+        Validate.c(req, Map.of(
+                messageLib.getAreaNameCantNull(), AreaRequestV1::getArea_name,
+                messageLib.getAreaLandCantNull(), AreaRequestV1::getArea_land,
+                messageLib.getFarmerIdNotFound(), AreaRequestV1::getFarmer_id,
+                messageLib.getAreaCoordinatesCantNull(), AreaRequestV1::getCoordinates
+        ));
+        FarmerEntity farmerById = setFarmerRelationID(req.getFarmer_id());
+
+        AreaEntity areas = new AreaEntity();
+        areas.setArea_name(req.getArea_name());
+        areas.setArea_land(req.getArea_land());
+        areas.setFarmer(farmerById);
+        areas.setCreatedBy(getCurentUser());
+        areas.setCreatedDate(getCreatedDate());
+
+        List<CoordinateEntity> coordinates = new ArrayList<>();
+
+        if (req.getCoordinates() != null) {
+            for (AreaRequestV1.CoordinatesReq coordReq : req.getCoordinates()) {
+                CoordinateEntity coordinate = new CoordinateEntity();
+                coordinate.setSeq(coordReq.getSeq());
+                coordinate.setLat(coordReq.getLat());
+                coordinate.setLng(coordReq.getLng());
+                coordinate.setArea(areas);
+                coordinate.setCreatedBy(areas.getCreatedBy());
+                coordinate.setCreatedDate(areas.getCreatedDate());
+
+                coordinates.add(coordinate);
+            }
+        }
+        areas.setCoordinates(coordinates);
+        return areaRepository.save(areas);
+    }
+
+    private AreaEntity findAreaById(String id) {
         return areaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(messageLib.getAreaNotFound()));
     }
 
-    private FarmerEntity farmer(String id) {
+    private FarmerEntity setFarmerRelationID(String id) {
         return farmerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(messageLib.getFarmerIdNotFound()));
     }

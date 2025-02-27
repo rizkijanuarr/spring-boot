@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.*;
 public interface AreaControllerV1 {
 
     @GetMapping
-    ResponseEntity<BaseResponse> index();
+    ResponseEntity<BaseResponse> getListArea();
 
     @PostMapping
-    ResponseEntity<BaseResponse> store(@RequestBody AreaRequestV1 req);
+    ResponseEntity<BaseResponse> createArea(@RequestBody AreaRequestV1 req);
 
     @GetMapping("/{id}")
-    ResponseEntity<BaseResponse> show(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> detailArea(@PathVariable("id") String id);
 
     @PutMapping("/{id}")
-    ResponseEntity<BaseResponse> update(@PathVariable("id") String id, @RequestBody AreaRequestV1 req);
+    ResponseEntity<BaseResponse> updateArea(@PathVariable("id") String id, @RequestBody AreaRequestV1 req);
 
     @DeleteMapping("/{id}")
-    ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> deleteArea(@PathVariable("id") String id);
 
     @GetMapping("list/ACTIVE")
     ResponseEntity<BaseResponseSlice> getAreaActive(Pageable pageable);
