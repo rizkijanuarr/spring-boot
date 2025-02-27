@@ -44,11 +44,6 @@ public class UserServiceImplV1 implements UserServiceV1 {
 
     @Override
     public UserResponseV1 createUser(UserRequestV1 req) {
-        Validate.c(req, Map.of(
-                messageLib.getUserNameCantNull(), UserRequestV1::getUser_name,
-                messageLib.getUserEmailCantNull(), UserRequestV1::getUser_email,
-                messageLib.getUserPasswordCantNull(), UserRequestV1::getUser_password
-        ));
         UserEntity savedUser = setUserInDatabase(req);
         return mapUserToResponse(savedUser);
     }
@@ -100,6 +95,12 @@ public class UserServiceImplV1 implements UserServiceV1 {
     }
 
     private UserEntity setUserInDatabase(UserRequestV1 req) {
+        Validate.c(req, Map.of(
+                messageLib.getUserNameCantNull(), UserRequestV1::getUser_name,
+                messageLib.getUserEmailCantNull(), UserRequestV1::getUser_email,
+                messageLib.getUserPasswordCantNull(), UserRequestV1::getUser_password
+        ));
+
         findRoleByName(req);
 
         UserEntity account = new UserEntity();
