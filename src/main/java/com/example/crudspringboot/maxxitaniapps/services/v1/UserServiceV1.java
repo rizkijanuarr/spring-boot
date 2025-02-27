@@ -1,7 +1,7 @@
 package com.example.crudspringboot.maxxitaniapps.services.v1;
 
 
-import com.example.crudspringboot.core.response.v1.LoginResponseV1;
+import com.example.crudspringboot.core.response.v1.AuthResponseV1;
 import com.example.crudspringboot.maxxitaniapps.request.v1.UserRequestV1;
 import com.example.crudspringboot.maxxitaniapps.response.v1.UserResponseV1;
 import org.springframework.data.domain.Pageable;
@@ -20,5 +20,5 @@ public interface UserServiceV1 {
     Slice<UserResponseV1> getUsersActive(Pageable pageable);
     Slice<UserResponseV1> getUsersInActive(Pageable pageable);
 
-    LoginResponseV1 getUserLogin(String userId);
+    AuthResponseV1 getUserLogin(String userId);
 }

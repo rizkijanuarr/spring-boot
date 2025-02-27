@@ -1,6 +1,6 @@
 package com.example.crudspringboot.maxxitaniapps.services.v1.impl;
 
-import com.example.crudspringboot.core.response.v1.LoginResponseV1;
+import com.example.crudspringboot.core.response.v1.AuthResponseV1;
 import com.example.crudspringboot.core.utils.exceptions.NotFoundException;
 import com.example.crudspringboot.core.utils.message.MessageLib;
 import com.example.crudspringboot.core.utils.validation.Validate;
@@ -117,7 +117,7 @@ public class UserServiceImplV1 implements UserServiceV1 {
     }
 
     @Override
-    public LoginResponseV1 getUserLogin(String userId) {
+    public AuthResponseV1 getUserLogin(String userId) {
         return null;
     }
 

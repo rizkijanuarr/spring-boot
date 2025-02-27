@@ -14,8 +14,8 @@ import org.springframework.data.domain.Pageable;
 public interface MitraControllerV1 {
 
     @GetMapping
-    // @PreAuthorize("hasRole('BASIC_FO')")
-    @PreAuthorize("hasAnyRole('SUPER_FO', 'BASIC_FO')")
+    @PreAuthorize("hasRole('BASIC_FO')")
+//    @PreAuthorize("has")
     ResponseEntity<BaseResponse> index();
 
     @PostMapping
