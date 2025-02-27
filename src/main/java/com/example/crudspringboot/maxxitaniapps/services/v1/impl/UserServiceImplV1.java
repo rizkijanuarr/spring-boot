@@ -67,7 +67,7 @@ public class UserServiceImplV1 implements UserServiceV1 {
 
     @Override
     public UserResponseV1 deleteUser(String id) {
-        return mapUserToResponse(setUserSoftDeleteUser(id));
+        return mapUserToResponse(setUserSoftDelete(id));
     }
 
     @Override
@@ -129,11 +129,6 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return userRepository.save(userById);
     }
 
-    @Override
-    public AuthResponseV1 getUserLogin(String userId) {
-        return null;
-    }
-
     private UserResponseV1 mapUserToResponse(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())
@@ -155,7 +150,7 @@ public class UserServiceImplV1 implements UserServiceV1 {
                 .orElseThrow(() -> new NotFoundException(messageLib.getUserIdNotFound()));
     }
 
-    private UserEntity setUserSoftDeleteUser (String id) {
+    private UserEntity setUserSoftDelete (String id) {
         UserEntity userById = findUserById(id);
 
         userById.setDeletedDate(getModifiedDate());

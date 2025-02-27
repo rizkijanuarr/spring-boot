@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface MitraServiceV1 {
 
-    List<MitraResponseV1> index();
-    MitraResponseV1 store(MitraRequestV1 req);
-    MitraResponseV1 show(String id, String requester);
-    MitraResponseV1 update(String id, MitraRequestV1 req);
-    MitraResponseV1 delete(String id);
+    List<MitraResponseV1> getListMitra();
+    MitraResponseV1 createMitra(MitraRequestV1 req);
+    MitraResponseV1 detailMitra(String id, String requester);
+    MitraResponseV1 updateMitra(String id, MitraRequestV1 req);
+    MitraResponseV1 deleteMitra(String id);
 
     Slice<MitraResponseV1> getMitraActive(Pageable pageable);
     Slice<MitraResponseV1> getMitraInActive(Pageable pageable);

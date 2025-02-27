@@ -19,6 +19,4 @@ public interface UserServiceV1 {
 
     Slice<UserResponseV1> getUsersActive(Pageable pageable);
     Slice<UserResponseV1> getUsersInActive(Pageable pageable);
-
-    AuthResponseV1 getUserLogin(String userId);
 }

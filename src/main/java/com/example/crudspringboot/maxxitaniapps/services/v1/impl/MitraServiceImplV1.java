@@ -9,6 +9,7 @@ import com.example.crudspringboot.core.utils.validation.Validate;
 import com.example.crudspringboot.maxxitaniapps.repositories.MitraRepository;
 import com.example.crudspringboot.maxxitaniapps.repositories.entities.MitraEntity;
 import com.example.crudspringboot.maxxitaniapps.request.v1.MitraRequestV1;
+import com.example.crudspringboot.maxxitaniapps.request.v1.UserRequestV1;
 import com.example.crudspringboot.maxxitaniapps.response.v1.MitraResponseV1;
 import com.example.crudspringboot.maxxitaniapps.services.v1.MitraServiceV1;
 import lombok.RequiredArgsConstructor;
@@ -29,80 +30,43 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
     private final UserRepository userRepository;
 
     @Override
-    public List<MitraResponseV1> index() {
+    public List<MitraResponseV1> getListMitra() {
         List<MitraEntity> mitras = mitraRepository.findAllByOrderByCreatedDateDesc();
         List<MitraResponseV1> responses = new ArrayList<>();
         for (MitraEntity mitra : mitras) {
-            responses.add(responses(mitra));
+            responses.add(mapMitraToResponse(mitra));
         }
         return responses;
     }
 
     @Override
-    public MitraResponseV1 store(MitraRequestV1 req) {
+    public MitraResponseV1 createMitra(MitraRequestV1 req) {
         Validate.c(req, Map.of(
                 messageLib.getMitraNameCantNull(), MitraRequestV1::getMitra_name,
                 messageLib.getMitraPhoneCantNull(), MitraRequestV1::getMitra_phone,
                 messageLib.getMitraAddressCantNull(), MitraRequestV1::getMitra_address,
                 messageLib.getMitraTypeCantNull(), MitraRequestV1::getMitra_type
         ));
-
-        MitraEntity mitra = new MitraEntity();
-        mitra.setMitra_code(req.getMitra_code() != null ? req.getMitra_code() : generateRandomCode());
-        mitra.setMitra_name(req.getMitra_name());
-        mitra.setMitra_phone(req.getMitra_phone());
-        mitra.setMitra_address(req.getMitra_address());
-        mitra.setMitra_type(req.getMitra_type());
-        mitra.setCreatedBy(getCurentUser());
-        mitra.setCreatedDate(getCreatedDate());
-
-        MitraEntity created = mitraRepository.save(mitra);
-        return responses(created);
-    }
-
-    private MitraEntity mitra(String id) {
-        return mitraRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
-    }
-
-    private UserEntity getUser(String requester) {
-        return userRepository.findById(requester)
-                .orElseThrow(() -> new BadRequestException(messageLib.getUserIdNotFound()));
+        MitraEntity savedMitra = setMitraInDatabase(req);
+        return mapMitraToResponse(savedMitra);
     }
 
     @Override
-    public MitraResponseV1 show(String id, String requester) {
+    public MitraResponseV1 detailMitra(String id, String requester) {
         getUser(requester);
-        MitraEntity mit = mitra(id);
-        return responses(mit);
+        MitraEntity mitraById = findMitraById(id);
+        return mapMitraToResponse(mitraById);
     }
 
     @Override
-    public MitraResponseV1 update(String id, MitraRequestV1 req) {
-        MitraEntity mit = mitra(id);
-
-        mit.setMitra_name(req.getMitra_name());
-        mit.setMitra_phone(req.getMitra_phone());
-        mit.setMitra_address(req.getMitra_address());
-        mit.setMitra_type(req.getMitra_type());
-        mit.setModifiedBy(getModifiedByUpdate());
-        mit.setModifiedDate(getModifiedDate());
-
-        MitraEntity updated = mitraRepository.save(mit);
-        return responses(updated);
+    public MitraResponseV1 updateMitra(String id, MitraRequestV1 req) {
+        MitraEntity updated = setMitraUpdateInDatabase(id, req);
+        return mapMitraToResponse(updated);
     }
 
     @Override
-    public MitraResponseV1 delete(String id) {
-        MitraEntity mit = mitra(id);
-
-        mit.setDeletedDate(getModifiedDate());
-        mit.setDeletedBy(getCurentUser());
-        mit.setModifiedBy(getModifiedByDelete());
-        mit.setActive(false);
-
-        mitraRepository.save(mit);
-        return responses(mit);
+    public MitraResponseV1 deleteMitra(String id) {
+        return mapMitraToResponse(setMitraSoftDelete(id));
     }
 
     public Slice<MitraResponseV1> getMitraActive(Pageable pageable) {
@@ -110,7 +74,7 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
         List<MitraResponseV1> responses = new ArrayList<>();
 
         for (MitraEntity mitra : mitraList) {
-            responses.add(responses(mitra));
+            responses.add(mapMitraToResponse(mitra));
         }
 
         return new SliceImpl<>(responses, pageable, mitraList.hasNext());
@@ -121,13 +85,13 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
         List<MitraResponseV1> responses = new ArrayList<>();
 
         for (MitraEntity mitra : mitraList) {
-            responses.add(responses(mitra));
+            responses.add(mapMitraToResponse(mitra));
         }
 
         return new SliceImpl<>(responses, pageable, mitraList.hasNext());
     }
 
-    private MitraResponseV1 responses(MitraEntity entity) {
+    private MitraResponseV1 mapMitraToResponse(MitraEntity entity) {
         return MitraResponseV1.builder()
                 .id(entity.getId())
                 .mitra_code(entity.getMitra_code())
@@ -143,6 +107,55 @@ public class MitraServiceImplV1 implements MitraServiceV1 {
                 .modifiedBy(entity.getModifiedBy())
                 .build();
     }
+
+    private MitraEntity setMitraSoftDelete(String id) {
+        MitraEntity mitraById = findMitraById(id);
+
+        mitraById.setDeletedDate(getModifiedDate());
+        mitraById.setDeletedBy(getCurentUser());
+        mitraById.setModifiedBy(getModifiedByDelete());
+        mitraById.setActive(false);
+
+        return mitraRepository.save(mitraById);
+    }
+
+    private MitraEntity setMitraUpdateInDatabase(String id, MitraRequestV1 req) {
+        MitraEntity mitraById = findMitraById(id);
+
+        mitraById.setMitra_name(req.getMitra_name());
+        mitraById.setMitra_phone(req.getMitra_phone());
+        mitraById.setMitra_address(req.getMitra_address());
+        mitraById.setMitra_type(req.getMitra_type());
+        mitraById.setModifiedBy(getModifiedByUpdate());
+        mitraById.setModifiedDate(getModifiedDate());
+
+        return mitraRepository.save(mitraById);
+    }
+
+    private MitraEntity setMitraInDatabase(MitraRequestV1 req) {
+
+        MitraEntity mitra = new MitraEntity();
+        mitra.setMitra_code(req.getMitra_code() != null ? req.getMitra_code() : generateRandomCode());
+        mitra.setMitra_name(req.getMitra_name());
+        mitra.setMitra_phone(req.getMitra_phone());
+        mitra.setMitra_address(req.getMitra_address());
+        mitra.setMitra_type(req.getMitra_type());
+        mitra.setCreatedBy(getCurentUser());
+        mitra.setCreatedDate(getCreatedDate());
+
+        return mitraRepository.save(mitra);
+    }
+
+    private MitraEntity findMitraById(String id) {
+        return mitraRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
+    }
+
+    private UserEntity getUser(String requester) {
+        return userRepository.findById(requester)
+                .orElseThrow(() -> new BadRequestException(messageLib.getUserIdNotFound()));
+    }
+
 
     private String getCurentUser() {
         return "SYSTEM";

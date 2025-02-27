@@ -16,19 +16,19 @@ public interface MitraControllerV1 {
     @GetMapping
     @PreAuthorize("hasRole('BASIC_FO')")
 //    @PreAuthorize("has")
-    ResponseEntity<BaseResponse> index();
+    ResponseEntity<BaseResponse> getListMitra();
 
     @PostMapping
-    ResponseEntity<BaseResponse> store(@Valid @RequestBody MitraRequestV1 req);
+    ResponseEntity<BaseResponse> createMitra(@Valid @RequestBody MitraRequestV1 req);
 
     @GetMapping("/{id}")
-    ResponseEntity<BaseResponse> show(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> detailMitra(@PathVariable("id") String id);
 
     @PutMapping("/{id}")
-    ResponseEntity<BaseResponse> update(@PathVariable("id") String id, @RequestBody MitraRequestV1 req);
+    ResponseEntity<BaseResponse> updateMitra(@PathVariable("id") String id, @RequestBody MitraRequestV1 req);
 
     @DeleteMapping("/{id}")
-    ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> deleteMitra(@PathVariable("id") String id);
 
     @GetMapping("list/ACTIVE")
     ResponseEntity<BaseResponseSlice> getMitraActive(Pageable pageable);

@@ -23,29 +23,29 @@ public class MitraControllerImplV1 implements MitraControllerV1 {
     private final HttpServletRequest httpServletRequest;
 
     @Override
-    public ResponseEntity<BaseResponse> index() {
-        return ResponseHelper.buildOkResponse(mitraService.index());
+    public ResponseEntity<BaseResponse> getListMitra() {
+        return ResponseHelper.buildOkResponse(mitraService.getListMitra());
     }
 
     @Override
-    public ResponseEntity<BaseResponse> store(MitraRequestV1 req) {
-        return ResponseHelper.buildOkResponse(mitraService.store(req));
+    public ResponseEntity<BaseResponse> createMitra(MitraRequestV1 req) {
+        return ResponseHelper.buildOkResponse(mitraService.createMitra(req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> show(String id) {
+    public ResponseEntity<BaseResponse> detailMitra(String id) {
         String requester = httpServletRequest.getAttribute(ConstantHeader.HEADER_X_ID).toString();
-        return ResponseHelper.buildOkResponse(mitraService.show(id, requester));
+        return ResponseHelper.buildOkResponse(mitraService.detailMitra(id, requester));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> update(String id, MitraRequestV1 req) {
-        return ResponseHelper.buildOkResponse(mitraService.update(id, req));
+    public ResponseEntity<BaseResponse> updateMitra(String id, MitraRequestV1 req) {
+        return ResponseHelper.buildOkResponse(mitraService.updateMitra(id, req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> delete(String id) {
-        return ResponseHelper.buildOkResponse(mitraService.delete(id));
+    public ResponseEntity<BaseResponse> deleteMitra(String id) {
+        return ResponseHelper.buildOkResponse(mitraService.deleteMitra(id));
     }
 
     @Override
