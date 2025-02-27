@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface FarmerServiceV1 {
 
-    List<FarmerResponseV1> index();
-    FarmerResponseV1 store(FarmerRequestV1 req);
-    FarmerResponseV1 show(String id);
-    FarmerResponseV1 update(String id, FarmerRequestV1 req);
-    FarmerResponseV1 delete(String id);
+    List<FarmerResponseV1> getListFarmer();
+    FarmerResponseV1 createFarmer(FarmerRequestV1 req);
+    FarmerResponseV1 detailFarmer(String id);
+    FarmerResponseV1 updateFarmer(String id, FarmerRequestV1 req);
+    FarmerResponseV1 deleteFarmer(String id);
 
     Slice<FarmerResponseV1> getFarmerActive(Pageable pageable);
     Slice<FarmerResponseV1> getFarmerInActive(Pageable pageable);

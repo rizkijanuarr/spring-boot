@@ -28,24 +28,23 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
     private final MessageLib messageLib;
 
     @Override
-    public List<FarmerResponseV1> index() {
+    public List<FarmerResponseV1> getListFarmer() {
         List<FarmerEntity> farmers = farmerRepository.findAllByOrderByCreatedDateDesc();
         List<FarmerResponseV1> responses = new ArrayList<>();
         for (FarmerEntity farmer : farmers) {
-            responses.add(responses(farmer));
+            responses.add(mapFarmerToResponse(farmer));
         }
         return responses;
     }
 
-    @Override
-    public FarmerResponseV1 store(FarmerRequestV1 req) {
+    private FarmerEntity setFarmerInDatabase(FarmerRequestV1 req) {
         Validate.c(req, Map.of(
                 messageLib.getFarmerNameNotFound(), FarmerRequestV1::getFarmer_name,
                 messageLib.getFarmerPhoneNotFound(), FarmerRequestV1::getFarmer_phone,
                 messageLib.getFarmerAddressNotFound(), FarmerRequestV1::getFarmer_address
         ));
 
-        MitraEntity mit = mitra(req.getMitra_id());
+        MitraEntity mit = setMitraRelationID(req);
 
         FarmerEntity farmer = new FarmerEntity();
         farmer.setFarmer_code(req.getFarmer_code() != null ? req.getFarmer_code() : generateRandomCode());
@@ -56,43 +55,27 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         farmer.setCreatedBy(getCurentUser());
         farmer.setCreatedDate(getCreatedDate());
 
-        FarmerEntity created = farmerRepository.save(farmer);
-        return responses(created);
+        return farmerRepository.save(farmer);
     }
 
     @Override
-    public FarmerResponseV1 show(String id) {
-        FarmerEntity far = farmer(id);
-        return responses(far);
+    public FarmerResponseV1 createFarmer(FarmerRequestV1 req) {
+        return mapFarmerToResponse(setFarmerInDatabase(req));
     }
 
     @Override
-    public FarmerResponseV1 update(String id, FarmerRequestV1 req) {
-        FarmerEntity far = farmer(id);
-        MitraEntity mit = mitraID(req);
-
-        far.setFarmer_name(req.getFarmer_name());
-        far.setFarmer_phone(req.getFarmer_phone());
-        far.setFarmer_address(req.getFarmer_address());
-        far.setMitra(mit);
-        far.setModifiedBy(getModifiedByUpdate());
-        far.setModifiedDate(getModifiedDate());
-
-        FarmerEntity updated = farmerRepository.save(far);
-        return responses(updated);
+    public FarmerResponseV1 detailFarmer(String id) {
+        return mapFarmerToResponse(findFarmerById(id));
     }
 
     @Override
-    public FarmerResponseV1 delete(String id) {
-        FarmerEntity far = farmer(id);
+    public FarmerResponseV1 updateFarmer(String id, FarmerRequestV1 req) {
+        return mapFarmerToResponse(setMitraUpdateInDatabase(id, req));
+    }
 
-        far.setDeletedDate(getModifiedDate());
-        far.setDeletedBy(getCurentUser());
-        far.setModifiedBy(getModifiedByDelete());
-        far.setActive(false);
-
-        farmerRepository.save(far);
-        return responses(far);
+    @Override
+    public FarmerResponseV1 deleteFarmer(String id) {
+        return mapFarmerToResponse(setSoftDeleteFarmer(id));
     }
 
     @Override
@@ -101,7 +84,7 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         List<FarmerResponseV1> responses = new ArrayList<>();
 
         for (FarmerEntity farmer : farmerList) {
-            responses.add(responses(farmer));
+            responses.add(mapFarmerToResponse(farmer));
         }
 
         return new SliceImpl<>(responses, pageable, farmerList.hasNext());
@@ -113,13 +96,13 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
         List<FarmerResponseV1> responses = new ArrayList<>();
 
         for (FarmerEntity farmer : farmerList) {
-            responses.add(responses(farmer));
+            responses.add(mapFarmerToResponse(farmer));
         }
 
         return new SliceImpl<>(responses, pageable, farmerList.hasNext());
     }
 
-    private FarmerResponseV1 responses(FarmerEntity entity) {
+    private FarmerResponseV1 mapFarmerToResponse(FarmerEntity entity) {
         return FarmerResponseV1.builder()
                 .id(entity.getId())
                 .farmer_code(entity.getFarmer_code())
@@ -141,20 +124,41 @@ public class FarmerServiceImplV1 implements FarmerServiceV1 {
                 .build();
     }
 
-    private FarmerEntity farmer(String id) {
+    private FarmerEntity findFarmerById(String id) {
         return farmerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(messageLib.getFarmerIdNotFound()));
     }
 
-    private MitraEntity mitra(String id) {
-        return mitraRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
-    }
-
-    private MitraEntity mitraID(FarmerRequestV1 req) {
+    private MitraEntity setMitraRelationID(FarmerRequestV1 req) {
         return mitraRepository.findById(req.getMitra_id())
                 .orElseThrow(() -> new NotFoundException(messageLib.getMitraNotFound()));
     }
+
+    private FarmerEntity setMitraUpdateInDatabase(String id, FarmerRequestV1 req) {
+        FarmerEntity farmerById = findFarmerById(id);
+        MitraEntity mitraById = setMitraRelationID(req);
+
+        farmerById.setFarmer_name(req.getFarmer_name());
+        farmerById.setFarmer_phone(req.getFarmer_phone());
+        farmerById.setFarmer_address(req.getFarmer_address());
+        farmerById.setMitra(mitraById);
+        farmerById.setModifiedBy(getModifiedByUpdate());
+        farmerById.setModifiedDate(getModifiedDate());
+
+        return farmerRepository.save(farmerById);
+    }
+
+    private FarmerEntity setSoftDeleteFarmer(String id) {
+        FarmerEntity farmerById = findFarmerById(id);
+
+        farmerById.setDeletedDate(getModifiedDate());
+        farmerById.setDeletedBy(getCurentUser());
+        farmerById.setModifiedBy(getModifiedByDelete());
+        farmerById.setActive(false);
+
+        return farmerRepository.save(farmerById);
+    }
+
 
     private String getCurentUser() {
         return "SYSTEM";

@@ -20,28 +20,28 @@ public class FarmerControllerImplV1 implements FarmerControllerV1 {
     private final FarmerServiceV1 farmerService;
 
     @Override
-    public ResponseEntity<BaseResponse> index() {
-        return ResponseHelper.buildOkResponse(farmerService.index());
+    public ResponseEntity<BaseResponse> getListFarmer() {
+        return ResponseHelper.buildOkResponse(farmerService.getListFarmer());
     }
 
     @Override
-    public ResponseEntity<BaseResponse> store(FarmerRequestV1 req) {
-        return ResponseHelper.buildOkResponse(farmerService.store(req));
+    public ResponseEntity<BaseResponse> createFarmer(FarmerRequestV1 req) {
+        return ResponseHelper.buildOkResponse(farmerService.createFarmer(req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> show(String id) {
-        return ResponseHelper.buildOkResponse(farmerService.show(id));
+    public ResponseEntity<BaseResponse> detailFarmer(String id) {
+        return ResponseHelper.buildOkResponse(farmerService.detailFarmer(id));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> update(String id, FarmerRequestV1 req) {
-        return ResponseHelper.buildOkResponse(farmerService.update(id, req));
+    public ResponseEntity<BaseResponse> updateFarmer(String id, FarmerRequestV1 req) {
+        return ResponseHelper.buildOkResponse(farmerService.updateFarmer(id, req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> delete(String id) {
-        return ResponseHelper.buildOkResponse(farmerService.delete(id));
+    public ResponseEntity<BaseResponse> deleteFarmer(String id) {
+        return ResponseHelper.buildOkResponse(farmerService.deleteFarmer(id));
     }
 
     @Override

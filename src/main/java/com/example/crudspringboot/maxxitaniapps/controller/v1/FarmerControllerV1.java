@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.*;
 public interface FarmerControllerV1 {
 
     @GetMapping
-    ResponseEntity<BaseResponse> index();
+    ResponseEntity<BaseResponse> getListFarmer();
 
     @PostMapping
-    ResponseEntity<BaseResponse> store(@RequestBody FarmerRequestV1 req);
+    ResponseEntity<BaseResponse> createFarmer(@RequestBody FarmerRequestV1 req);
 
     @GetMapping("/{id}")
-    ResponseEntity<BaseResponse> show(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> detailFarmer(@PathVariable("id") String id);
 
     @PutMapping("/{id}")
-    ResponseEntity<BaseResponse> update(@PathVariable("id") String id, @RequestBody FarmerRequestV1 req);
+    ResponseEntity<BaseResponse> updateFarmer(@PathVariable("id") String id, @RequestBody FarmerRequestV1 req);
 
     @DeleteMapping("/{id}")
-    ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> deleteFarmer(@PathVariable("id") String id);
 
     @GetMapping("list/ACTIVE")
     ResponseEntity<BaseResponseSlice> getFarmerActive(Pageable pageable);
