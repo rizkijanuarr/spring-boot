@@ -20,28 +20,28 @@ public class UserControllerImplV1 implements UserControllerV1 {
     private final UserServiceV1 userService;
 
     @Override
-    public ResponseEntity<BaseResponse> index() {
-        return ResponseHelper.buildOkResponse(userService.index());
+    public ResponseEntity<BaseResponse> getListUser() {
+        return ResponseHelper.buildOkResponse(userService.getListUser());
     }
 
     @Override
-    public ResponseEntity<BaseResponse> store(UserRequestV1 req) {
-        return ResponseHelper.buildOkResponse(userService.store(req));
+    public ResponseEntity<BaseResponse> createUser(UserRequestV1 req) {
+        return ResponseHelper.buildOkResponse(userService.createUser(req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> show(String id) {
-        return ResponseHelper.buildOkResponse(userService.show(id));
+    public ResponseEntity<BaseResponse> detailUser(String id) {
+        return ResponseHelper.buildOkResponse(userService.detailUser(id));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> update(String id, UserRequestV1 req) {
-        return ResponseHelper.buildOkResponse(userService.update(id, req));
+    public ResponseEntity<BaseResponse> updateUser(String id, UserRequestV1 req) {
+        return ResponseHelper.buildOkResponse(userService.updateUser(id, req));
     }
 
     @Override
-    public ResponseEntity<BaseResponse> delete(String id) {
-        return ResponseHelper.buildOkResponse(userService.delete(id));
+    public ResponseEntity<BaseResponse> deleteUser(String id) {
+        return ResponseHelper.buildOkResponse(userService.deleteUser(id));
     }
 
     @Override

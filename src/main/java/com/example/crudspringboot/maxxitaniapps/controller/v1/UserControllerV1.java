@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.*;
 public interface UserControllerV1 {
 
     @GetMapping
-    ResponseEntity<BaseResponse> index();
+    ResponseEntity<BaseResponse> getListUser();
 
     @PostMapping
-    ResponseEntity<BaseResponse> store(@Valid @RequestBody UserRequestV1 req);
+    ResponseEntity<BaseResponse> createUser(@Valid @RequestBody UserRequestV1 req);
 
     @GetMapping("/{id}")
-    ResponseEntity<BaseResponse> show(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> detailUser(@PathVariable("id") String id);
 
     @PutMapping("/{id}")
-    ResponseEntity<BaseResponse> update(@PathVariable("id") String id, @RequestBody UserRequestV1 req);
+    ResponseEntity<BaseResponse> updateUser(@PathVariable("id") String id, @RequestBody UserRequestV1 req);
 
     @DeleteMapping("/{id}")
-    ResponseEntity<BaseResponse> delete(@PathVariable("id") String id);
+    ResponseEntity<BaseResponse> deleteUser(@PathVariable("id") String id);
 
     @GetMapping("list/ACTIVE")
     ResponseEntity<BaseResponseSlice> getUsersActive(Pageable pageable);

@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface UserServiceV1 {
 
-    List<UserResponseV1> index();
-    UserResponseV1 store(UserRequestV1 req);
-    UserResponseV1 show(String id);
-    UserResponseV1 update(String id, UserRequestV1 req);
-    UserResponseV1 delete(String id);
+    List<UserResponseV1> getListUser();
+    UserResponseV1 createUser(UserRequestV1 req);
+    UserResponseV1 detailUser(String id);
+    UserResponseV1 updateUser(String id, UserRequestV1 req);
+    UserResponseV1 deleteUser(String id);
 
     Slice<UserResponseV1> getUsersActive(Pageable pageable);
     Slice<UserResponseV1> getUsersInActive(Pageable pageable);

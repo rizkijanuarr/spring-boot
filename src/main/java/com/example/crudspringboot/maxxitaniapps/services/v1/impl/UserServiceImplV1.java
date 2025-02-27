@@ -1,5 +1,8 @@
 package com.example.crudspringboot.maxxitaniapps.services.v1.impl;
 
+import com.example.crudspringboot.core.repositories.RoleRepository;
+import com.example.crudspringboot.core.repositories.entities.RoleEntity;
+import com.example.crudspringboot.core.request.RegisterRequestV1;
 import com.example.crudspringboot.core.response.v1.AuthResponseV1;
 import com.example.crudspringboot.core.utils.exceptions.NotFoundException;
 import com.example.crudspringboot.core.utils.message.MessageLib;
@@ -13,13 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -27,69 +28,46 @@ import java.util.Map;
 public class UserServiceImplV1 implements UserServiceV1 {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final MessageLib messageLib;
 
     @Override
-    public List<UserResponseV1> index() {
+    public List<UserResponseV1> getListUser() {
         List<UserEntity> users = userRepository.findAllByOrderByCreatedDateDesc();
         List<UserResponseV1> responses = new ArrayList<>();
         for (UserEntity user : users) {
-            responses.add(responses(user));
+            responses.add(mapUserToResponse(user));
         }
         return responses;
     }
 
     @Override
-    public UserResponseV1 store(UserRequestV1 req) {
+    public UserResponseV1 createUser(UserRequestV1 req) {
         Validate.c(req, Map.of(
                 messageLib.getUserNameCantNull(), UserRequestV1::getUser_name,
                 messageLib.getUserEmailCantNull(), UserRequestV1::getUser_email,
                 messageLib.getUserPasswordCantNull(), UserRequestV1::getUser_password
         ));
-        UserEntity user = new UserEntity();
-        user.setUser_name(req.getUser_name());
-        user.setUser_email(req.getUser_email());
-        user.setUser_password(req.getUser_password());
-        user.setUser_phone(req.getUser_phone());
-        user.setCreatedBy(getCurentUser());
-        user.setCreatedDate(getCreatedDate());
-
-        UserEntity created = userRepository.save(user);
-        return responses(created);
+        UserEntity savedUser = setUserInDatabase(req);
+        return mapUserToResponse(savedUser);
     }
 
     @Override
-    public UserResponseV1 show(String id) {
-        UserEntity us = user(id);
-        return responses(us);
+    public UserResponseV1 detailUser(String id) {
+        UserEntity userById = findUserById(id);
+        return mapUserToResponse(userById);
     }
 
     @Override
-    public UserResponseV1 update(String id, UserRequestV1 req) {
-        UserEntity us = user(id);
-
-        us.setUser_name(req.getUser_name());
-        us.setUser_email(req.getUser_email());
-        us.setUser_password(req.getUser_password());
-        us.setUser_phone(req.getUser_phone());
-        us.setModifiedBy(getModifiedByUpdate());
-        us.setModifiedDate(getModifiedDate());
-
-        UserEntity updated = userRepository.save(us);
-        return responses(updated);
+    public UserResponseV1 updateUser(String id, UserRequestV1 req) {
+        UserEntity updated = setUserUpdateInDatabase(id, req);
+        return mapUserToResponse(updated);
     }
 
     @Override
-    public UserResponseV1 delete(String id) {
-        UserEntity us = user(id);
-
-        us.setDeletedDate(getModifiedDate());
-        us.setDeletedBy(getCurentUser());
-        us.setModifiedBy(getModifiedByDelete());
-        us.setActive(false);
-
-        userRepository.save(us);
-        return responses(us);
+    public UserResponseV1 deleteUser(String id) {
+        return mapUserToResponse(setUserSoftDeleteUser(id));
     }
 
     @Override
@@ -98,7 +76,7 @@ public class UserServiceImplV1 implements UserServiceV1 {
         List<UserResponseV1> responses = new ArrayList<>();
 
         for (UserEntity user : usersList) {
-            responses.add(responses(user));
+            responses.add(mapUserToResponse(user));
         }
 
         return new SliceImpl<>(responses, pageable, usersList.hasNext());
@@ -110,10 +88,45 @@ public class UserServiceImplV1 implements UserServiceV1 {
         List<UserResponseV1> responses = new ArrayList<>();
 
         for (UserEntity user : usersList) {
-            responses.add(responses(user));
+            responses.add(mapUserToResponse(user));
         }
 
         return new SliceImpl<>(responses, pageable, usersList.hasNext());
+    }
+
+    private Optional<RoleEntity> findRoleByName(UserRequestV1 req) {
+        return Optional.ofNullable(roleRepository.findByName(req.getRole())
+                .orElseThrow(() -> new RuntimeException("Role Not Found")));
+    }
+
+    private UserEntity setUserInDatabase(UserRequestV1 req) {
+        findRoleByName(req);
+
+        UserEntity account = new UserEntity();
+        account.setUser_name(req.getUser_name());
+        account.setUser_email(req.getUser_email());
+        account.setUser_password(passwordEncoder.encode(req.getUser_password()));
+        account.setUser_phone(req.getUser_phone());
+        account.setRole(findRoleByName(req).get());
+        account.setCreatedBy(getCurentUser());
+        account.setCreatedDate(getCreatedDate());
+
+        return userRepository.save(account);
+    }
+
+    private UserEntity setUserUpdateInDatabase(String id, UserRequestV1 req) {
+        findRoleByName(req);
+        UserEntity userById = findUserById(id);
+
+        userById.setUser_name(req.getUser_name());
+        userById.setUser_email(req.getUser_email());
+        userById.setUser_password(passwordEncoder.encode(req.getUser_password()));
+        userById.setUser_phone(req.getUser_phone());
+        userById.setRole(findRoleByName(req).get());
+        userById.setModifiedBy(getModifiedByUpdate());
+        userById.setModifiedDate(getModifiedDate());
+
+        return userRepository.save(userById);
     }
 
     @Override
@@ -121,7 +134,7 @@ public class UserServiceImplV1 implements UserServiceV1 {
         return null;
     }
 
-    private UserResponseV1 responses(UserEntity entity) {
+    private UserResponseV1 mapUserToResponse(UserEntity entity) {
         return UserResponseV1.builder()
                 .id(entity.getId())
                 .user_name(entity.getUser_name())
@@ -137,9 +150,20 @@ public class UserServiceImplV1 implements UserServiceV1 {
                 .build();
     }
 
-    private UserEntity user(String id) {
+    private UserEntity findUserById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(messageLib.getUserIdNotFound()));
+    }
+
+    private UserEntity setUserSoftDeleteUser (String id) {
+        UserEntity userById = findUserById(id);
+
+        userById.setDeletedDate(getModifiedDate());
+        userById.setDeletedBy(getCurentUser());
+        userById.setModifiedBy(getModifiedByDelete());
+        userById.setActive(false);
+
+        return userRepository.save(userById);
     }
 
     private String getCurentUser() {
