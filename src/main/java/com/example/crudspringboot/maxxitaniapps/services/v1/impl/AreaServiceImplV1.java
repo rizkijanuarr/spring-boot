@@ -112,23 +112,21 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
 
     private AreaResponseV1 mapAreaToResponse(AreaEntity entity) {
         return AreaResponseV1.builder()
-                .id(entity.getId())
-                .area_name(entity.getArea_name())
-                .area_land(entity.getArea_land())
-                .farmer_id(entity.getFarmer().getId()) // 2 table
-                .mitra_id(entity.getFarmer().getMitra().getId()) // 3 table
-                .farmer(AreaResponseV1.FarmerResponse.builder()
+                .area_id(entity.getId())
+                .farmer_id(entity.getFarmer().getId())
+                .farmer_response(AreaResponseV1.FarmerResponse.builder()
                         .id(entity.getFarmer().getId())
                         .farmer_code(entity.getFarmer().getFarmer_code())
                         .farmer_name(entity.getFarmer().getFarmer_name())
-                        .mitra(AreaResponseV1.MitraResponse.builder()
-                                .id(entity.getFarmer().getMitra().getId())
-                                .mitra_code(entity.getFarmer().getMitra().getMitra_code())
-                                .mitra_name(entity.getFarmer().getMitra().getMitra_name())
-                                .build()
-                        )
                         .build())
-                .coordinates(entity.getCoordinates().stream()
+                .mitra_profile_response(AreaResponseV1.MitraProfileResponse.builder()
+                        .id(entity.getFarmer().getMitra().getId())
+                        .mitra_code(entity.getFarmer().getMitra().getMitra_code())
+                        .mitra_name(entity.getFarmer().getMitra().getMitra_name())
+                        .mitra_address(entity.getFarmer().getMitra().getMitra_address())
+                        .mitra_type(entity.getFarmer().getMitra().getMitra_type())
+                        .build())
+                .coordinate(entity.getCoordinates().stream()
                         .map(this::mapToCoordinates)
                         .collect(Collectors.toList()))
                 .active(entity.getActive())
@@ -140,8 +138,8 @@ public class AreaServiceImplV1 implements AreaServiceV1 {
                 .build();
     }
 
-    private AreaResponseV1.CoordinatesResponse mapToCoordinates(CoordinateEntity coordinate) {
-        return AreaResponseV1.CoordinatesResponse.builder()
+    private AreaResponseV1.Coordinate mapToCoordinates(CoordinateEntity coordinate) {
+        return AreaResponseV1.Coordinate.builder()
                 .seq(coordinate.getSeq())
                 .lat(coordinate.getLat())
                 .lng(coordinate.getLng())

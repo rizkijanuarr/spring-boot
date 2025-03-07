@@ -5,6 +5,7 @@ import com.example.crudspringboot.core.response.base.BaseResponseSlice;
 import com.example.crudspringboot.maxxitaniapps.request.v1.AreaRequestV1;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public interface AreaControllerV1 {
 
     @GetMapping
+    @PreAuthorize("hasRole('SUPER_FO')")
     ResponseEntity<BaseResponse> getListArea();
 
     @PostMapping
+    @PreAuthorize("hasRole('SUPER_FO')")
     ResponseEntity<BaseResponse> createArea(@RequestBody AreaRequestV1 req);
 
     @GetMapping("/{id}")

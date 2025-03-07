@@ -1,6 +1,7 @@
 package com.example.crudspringboot.maxxitaniapps.response.v1;
 
 import com.example.crudspringboot.core.utils.date.DateUtil;
+import com.example.crudspringboot.core.utils.enums.MitraTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -101,13 +102,11 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AreaResponseV1 {
-    private String id;
-    private String area_name;
-    private BigDecimal area_land;
+    private String area_id;
     private String farmer_id;
-    private String mitra_id;
-    private FarmerResponse farmer;
-    private List<CoordinatesResponse> coordinates;
+    private FarmerResponse farmer_response;
+    private MitraProfileResponse mitra_profile_response;
+    private List<Coordinate> coordinate;
 
     @JsonIgnore
     private Date createdDate;
@@ -141,24 +140,25 @@ public class AreaResponseV1 {
         private String id;
         private String farmer_code;
         private String farmer_name;
-        private MitraResponse mitra;
     }
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MitraResponse {
+    public static class MitraProfileResponse {
         private String id;
         private String mitra_code;
         private String mitra_name;
+        private String mitra_address;
+        private MitraTypeEnum mitra_type;
     }
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CoordinatesResponse {
+    public static class Coordinate {
         private Integer seq;
         private Double lat;
         private Double lng;
