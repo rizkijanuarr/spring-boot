@@ -1,8 +1,8 @@
 package com.example.crudspringboot;
 
-import com.example.crudspringboot.core.repositories.RoleRepository;
-import com.example.crudspringboot.core.repositories.entities.RoleEntity;
-import com.example.crudspringboot.core.utils.enums.RoleEnum;
+import com.example.crudspringboot.repositories.RoleRepository;
+import com.example.crudspringboot.repositories.entities.RoleEntity;
+import com.example.crudspringboot.utils.enums.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
