@@ -1,5 +1,6 @@
-package com.example.crudspringboot.repositories.entities;
+package com.example.crudspringboot.repositories.entities.auth;
 
+import com.example.crudspringboot.repositories.entities.base.BaseEntity;
 import com.example.crudspringboot.utils.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.*;

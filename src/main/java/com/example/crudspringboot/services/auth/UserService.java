@@ -1,7 +1,7 @@
 package com.example.crudspringboot.services.auth;
 
-import com.example.crudspringboot.repositories.UserRepository;
-import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.repositories.auth.UserRepository;
+import com.example.crudspringboot.repositories.entities.auth.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,7 @@
 package com.example.crudspringboot.services.v1.impl;
 
-import com.example.crudspringboot.repositories.UserRepository;
-import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.repositories.auth.UserRepository;
+import com.example.crudspringboot.repositories.entities.auth.UserEntity;
 import com.example.crudspringboot.utils.exceptions.BadRequestException;
 import com.example.crudspringboot.utils.exceptions.NotFoundException;
 import com.example.crudspringboot.utils.message.MessageLib;

@@ -1,5 +1,6 @@
 package com.example.crudspringboot.repositories.entities;
 
+import com.example.crudspringboot.repositories.entities.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

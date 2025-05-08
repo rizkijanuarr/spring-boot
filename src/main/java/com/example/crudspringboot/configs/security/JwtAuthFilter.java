@@ -2,8 +2,8 @@ package com.example.crudspringboot.configs.security;
 
 import com.example.crudspringboot.configs.constant.ConstantHeader;
 import com.example.crudspringboot.configs.constant.ConstantSecurity;
-import com.example.crudspringboot.repositories.UserRepository;
-import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.repositories.auth.UserRepository;
+import com.example.crudspringboot.repositories.entities.auth.UserEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

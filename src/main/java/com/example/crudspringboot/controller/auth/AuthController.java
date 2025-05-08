@@ -15,7 +15,6 @@ import java.util.Map;
 
 @BaseController("auth")
 public class AuthController {
-
     private final AuthService authService;
 
     public AuthController(AuthService authService) {
@@ -43,6 +42,17 @@ public class AuthController {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+    
+    @PostEndpoint(
+            value = "/refresh",
+            tagName = "User",
+            description = "Refresh Token",
+            group = SwaggerTypeGroup.APPS_WEB
+    )
+    public ResponseEntity<LoginResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        LoginResponse response = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
+    }
 
     @PostEndpoint(
             value = "/logout",
@@ -54,5 +64,4 @@ public class AuthController {
         Map<String, Boolean> response = authService.logout(token);
         return ResponseEntity.ok(response);
     }
-
 }

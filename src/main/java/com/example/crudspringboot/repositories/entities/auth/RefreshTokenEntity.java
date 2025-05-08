@@ -1,5 +1,6 @@
-package com.example.crudspringboot.repositories.entities;
+package com.example.crudspringboot.repositories.entities.auth;
 
+import com.example.crudspringboot.repositories.entities.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

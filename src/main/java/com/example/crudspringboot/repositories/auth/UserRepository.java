@@ -1,6 +1,6 @@
-package com.example.crudspringboot.repositories;
+package com.example.crudspringboot.repositories.auth;
 
-import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.repositories.entities.auth.UserEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +21,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
             nativeQuery = true
     )
     Optional<UserEntity> login(String email);
+
+    @Query("SELECT u FROM UserEntity u WHERE u.user_email = :email")
+    Optional<UserEntity> findByUser_email(String email);
 }

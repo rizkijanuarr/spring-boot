@@ -24,7 +24,8 @@ public class LoginResponse {
     private String user_email;
     private String phone;
     private RoleEnum role;
-    private String token;
+    private String access_token;
+    private String refresh_token;
     private Boolean active;
 
     @JsonIgnore

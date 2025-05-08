@@ -1,5 +1,6 @@
-package com.example.crudspringboot.repositories.entities;
+package com.example.crudspringboot.repositories.entities.auth;
 
+import com.example.crudspringboot.repositories.entities.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

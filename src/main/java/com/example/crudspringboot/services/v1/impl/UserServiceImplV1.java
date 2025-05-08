@@ -1,12 +1,12 @@
 package com.example.crudspringboot.services.v1.impl;
 
-import com.example.crudspringboot.repositories.RoleRepository;
-import com.example.crudspringboot.repositories.entities.RoleEntity;
+import com.example.crudspringboot.repositories.auth.RoleRepository;
+import com.example.crudspringboot.repositories.entities.auth.RoleEntity;
 import com.example.crudspringboot.utils.exceptions.NotFoundException;
 import com.example.crudspringboot.utils.message.MessageLib;
 import com.example.crudspringboot.utils.validation.Validate;
-import com.example.crudspringboot.repositories.UserRepository;
-import com.example.crudspringboot.repositories.entities.UserEntity;
+import com.example.crudspringboot.repositories.auth.UserRepository;
+import com.example.crudspringboot.repositories.entities.auth.UserEntity;
 import com.example.crudspringboot.request.v1.UserRequestV1;
 import com.example.crudspringboot.response.v1.UserResponseV1;
 import com.example.crudspringboot.services.v1.UserServiceV1;
@@ -31,7 +31,8 @@ public class UserServiceImplV1 implements UserServiceV1 {
     private final MessageLib messageLib;
 
     @Override
-    public List<UserResponseV1> getListUser() {
+    public List<UserResponseV1> getListUser(String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         List<UserEntity> users = userRepository.findAllByOrderByCreatedDateDesc();
         List<UserResponseV1> responses = new ArrayList<>();
         for (UserEntity user : users) {
@@ -41,30 +42,35 @@ public class UserServiceImplV1 implements UserServiceV1 {
     }
 
     @Override
-    public UserResponseV1 createUser(UserRequestV1 req) {
+    public UserResponseV1 createUser(UserRequestV1 req, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         UserEntity savedUser = setUserInDatabase(req);
         return mapUserToResponse(savedUser);
     }
 
     @Override
-    public UserResponseV1 detailUser(String id) {
+    public UserResponseV1 detailUser(String id, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         UserEntity userById = findUserById(id);
         return mapUserToResponse(userById);
     }
 
     @Override
-    public UserResponseV1 updateUser(String id, UserRequestV1 req) {
+    public UserResponseV1 updateUser(String id, UserRequestV1 req, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         UserEntity updated = setUserUpdateInDatabase(id, req);
         return mapUserToResponse(updated);
     }
 
     @Override
-    public UserResponseV1 deleteUser(String id) {
+    public UserResponseV1 deleteUser(String id, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         return mapUserToResponse(setUserSoftDelete(id));
     }
 
     @Override
-    public Slice<UserResponseV1> getUsersActive(Pageable pageable) {
+    public Slice<UserResponseV1> getUsersActive(Pageable pageable, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         Slice<UserEntity> usersList = userRepository.findAllByActiveTrueOrderByCreatedDateDesc(pageable);
         List<UserResponseV1> responses = new ArrayList<>();
 
@@ -76,7 +82,8 @@ public class UserServiceImplV1 implements UserServiceV1 {
     }
 
     @Override
-    public Slice<UserResponseV1> getUsersInActive(Pageable pageable) {
+    public Slice<UserResponseV1> getUsersInActive(Pageable pageable, String requester) {
+        UserEntity currentUser = getUserByRequester(requester);
         Slice<UserEntity> usersList = userRepository.findAllByActiveFalseOrderByCreatedDateDesc(pageable);
         List<UserResponseV1> responses = new ArrayList<>();
 
@@ -178,5 +185,10 @@ public class UserServiceImplV1 implements UserServiceV1 {
 
     private Date getCreatedDate() {
         return new Date();
+    }
+
+    private UserEntity getUserByRequester(String requester) {
+        return userRepository.findByUser_email(requester)
+                .orElseThrow(() -> new NotFoundException(messageLib.getUserIdNotFound()));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.crudspringboot.repositories.entities;
 
 
+import com.example.crudspringboot.repositories.entities.base.BaseEntity;
 import com.example.crudspringboot.utils.enums.MitraTypeEnum;
 import jakarta.persistence.*;
 import lombok.*;

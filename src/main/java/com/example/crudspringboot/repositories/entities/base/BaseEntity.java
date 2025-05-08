@@ -1,4 +1,4 @@
-package com.example.crudspringboot.repositories.entities;
+package com.example.crudspringboot.repositories.entities.base;
 
 
 import jakarta.persistence.*;

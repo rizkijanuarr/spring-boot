@@ -1,6 +1,6 @@
-package com.example.crudspringboot.repositories;
+package com.example.crudspringboot.repositories.auth;
 
-import com.example.crudspringboot.repositories.entities.RoleEntity;
+import com.example.crudspringboot.repositories.entities.auth.RoleEntity;
 import com.example.crudspringboot.utils.enums.RoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
